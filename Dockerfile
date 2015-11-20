@@ -1,4 +1,4 @@
-# Start from the Python image so that we have Python tools like `pip` available
+# Start from the Python image so that we have Python tools like `pip` available.
 FROM python
 
 ADD . /authentication

@@ -1,7 +1,8 @@
 import unittest
-import tempfile
 
+from requests import codes
 from authentication import authentication
+
 
 class SignupTests(unittest.TestCase):
     """
@@ -13,8 +14,9 @@ class SignupTests(unittest.TestCase):
         Test that a valid signup request returns an OK status.
         """
         test_app = authentication.app.test_client()
-        signup = test_app.post('/users', data={})
-        self.assertEqual(signup.headers['Content-Type'], 'application/json')
+        response = test_app.get('/login')
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.ok)
 
     def test_missing_username(self):
         pass
