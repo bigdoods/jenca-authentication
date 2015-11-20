@@ -14,12 +14,14 @@ Current commands:
 login
 signup
 
-TODO:
+## TODO
+
 * Make signup save a user to a database
 * Tests
 * Docker compose yml file
 * Travis CI
 * https://requires.io
 * Flake8
+* These should use proper HTTP request headers
 
 In the future this might hold other user details
