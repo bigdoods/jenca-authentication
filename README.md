@@ -3,7 +3,14 @@
 Authentication service for Jenca Cloud
 Python service with login and signup
 
-Uses Flask
+## Development
+
+The requirements for running this are:
+* Docker (probably you can use the Jenca Cloud Vagrant development environment)
+
+For development you need Python and to install the requirements
+
+Uses Flask http://flask.pocoo.org
 
 Build Docker image:
 
