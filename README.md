@@ -40,6 +40,7 @@ signup
 * Travis CI
 * https://requires.io
 * Flake8
+* Split up the Dockerfile for caching of apt-get update
 * These should use proper HTTP request headers
 * Automate API docs
 
