@@ -7,12 +7,13 @@ from authentication import authentication
 
 class SignupTests(unittest.TestCase):
     """
-    Signup tests.
+    Tests for the user sign up endpoint at ``/signup``.
     """
 
     def test_signup(self):
         """
-        Test that a valid signup request returns an OK status.
+        A signup request with a username and password returns a JSON response
+        with user credentials and a CREATED status.
         """
         test_app = authentication.app.test_client()
         data = {'username': 'alice', 'password': 'secret'}
@@ -21,10 +22,12 @@ class SignupTests(unittest.TestCase):
         self.assertEqual(response.status_code, codes.CREATED)
         self.assertEqual(json.loads(response.data), data)
 
-    def test_missing_username(self):
+    def test_missing_data(self):
+        """
+        A signup request without a username or password returns a BAD_REQUEST.
+        """
         test_app = authentication.app.test_client()
-        data = {'password': 'secret'}
-        response = test_app.post('/signup', data=data)
+        response = test_app.post('/signup', data={})
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
 
 
