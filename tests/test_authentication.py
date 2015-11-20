@@ -13,6 +13,8 @@ class SignupTests(unittest.TestCase):
         Test that a valid signup request returns an OK status.
         """
         test_app = authentication.app.test_client()
+        signup = test_app.post('/users', data={})
+        self.assertEqual(signup.headers['Content-Type'], 'application/json')
 
     def test_missing_username(self):
         pass
