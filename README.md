@@ -17,6 +17,16 @@ Build Docker image:
 docker build -t jenca/authentication .
 docker run --name jenca_authentication -p 5000:5000 -i -t jenca/authentication
 
+On OS X with Docker machine I've been running:
+
+```
+$ docker-machine ip dev
+$ 192.168.99.100
+$ curl 192.168.99.100:5000/login
+```
+
+for example
+
 Current commands:
 login
 signup
@@ -30,5 +40,6 @@ signup
 * https://requires.io
 * Flake8
 * These should use proper HTTP request headers
+* Automate API docs
 
 In the future this might hold other user details
