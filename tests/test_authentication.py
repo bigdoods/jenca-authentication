@@ -33,7 +33,7 @@ class SignupTests(unittest.TestCase):
 
 class LoginTests(unittest.TestCase):
     """
-    Tests for logging in.
+    Tests for the user log in endpoint at ``/login``.
     """
 
 if __name__ == '__main__':

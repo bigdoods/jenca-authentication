@@ -3,12 +3,6 @@ from requests import codes
 
 app = Flask(__name__)
 
-
-@app.route('/login', methods=['GET'])
-def login():
-    return jsonify({})
-
-
 @app.route('/signup', methods=['POST'])
 def signup():
     username = request.form['username']
