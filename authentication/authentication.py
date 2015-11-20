@@ -13,7 +13,8 @@ def login():
 def signup():
     username = request.form['username']
     password = request.form['password']
-    return jsonify({'username': username, 'password': password}), codes.CREATED
+    response_content = {'username': username, 'password': password}
+    return jsonify(response_content), codes.CREATED
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
