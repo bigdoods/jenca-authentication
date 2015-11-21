@@ -34,6 +34,10 @@ def login():
 def signup():
     email = request.form['email']
     password = request.form['password']
+
+    if User.query.filter_by(email=email).count():
+        return jsonify({}), codes.CONFLICT
+
     user = User(email=email, password=password)
     db.session.add(user)
     db.session.commit()
