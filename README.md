@@ -40,7 +40,6 @@ signup
 * Make signup save a user to a database (Flask-SQLAlchemy) - maybe https://flask-login.readthedocs.org/en/latest/
 * Tests
 * Travis CI (tox?)
-* https://requires.io
 * Flake8
 * Automate API docs (maybe use a schema, sphinx)
 * name > email
