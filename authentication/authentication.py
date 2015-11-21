@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 from flask.ext.sqlalchemy import SQLAlchemy
-# TODO Use login manager
 
 from requests import codes
 

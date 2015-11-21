@@ -37,12 +37,10 @@ signup
 
 ## TODO
 
-* Make signup save a user to a database (Flask-SQLAlchemy) - maybe https://flask-login.readthedocs.org/en/latest/
-* Tests
+* Use a login manager, maybe https://flask-login.readthedocs.org/en/latest/
 * Travis CI (tox?)
 * Flake8
 * Automate API docs (maybe use a schema, sphinx)
-* name > email
 * hash passwords (Flask-Bcrypt)
 * Try a formatter (YAPF?)
 
