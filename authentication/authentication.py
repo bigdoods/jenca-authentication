@@ -6,21 +6,22 @@ from requests import codes
 
 db = SQLAlchemy()
 
+class User(db.Model):
+    email = db.Column(db.String, primary_key=True)
+    password = db.Column(db.String)
+
 def create_app(database_uri):
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     db.init_app(app)
+
+    with app.app_context():
+        db.create_all()
+
     return app
 
 app = create_app(database_uri='sqlite:////tmp/test.db')
-
-class User(db.Model):
-    email = db.Column(db.String, primary_key=True)
-    password = db.Column(db.String)
-
-with app.app_context():
-    db.create_all()
 
 @app.route('/login', methods=['POST'])
 def login():
