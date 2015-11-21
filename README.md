@@ -1,3 +1,5 @@
+[![Requirements Status](https://requires.io/github/jenca-cloud/jenca-authentication/requirements.svg?branch=master)](https://requires.io/github/jenca-cloud/jenca-authentication/requirements/?branch=master)
+
 # jenca-authentication
 
 Authentication service for Jenca Cloud
