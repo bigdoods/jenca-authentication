@@ -35,12 +35,11 @@ signup
 
 ## TODO
 
-* Make signup save a user to a database
+* Make signup save a user to a database (Flask-SQLAlchemy)
 * Tests
-* Travis CI
+* Travis CI (tox?)
 * https://requires.io
 * Flake8
-* These should use proper HTTP request headers
-* Automate API docs
+* Automate API docs (maybe use a schema, sphinx)
 
 In the future this might hold other user details
