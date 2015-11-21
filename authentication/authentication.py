@@ -5,9 +5,11 @@ from requests import codes
 
 db = SQLAlchemy()
 
+
 class User(db.Model):
     email = db.Column(db.String, primary_key=True)
     password = db.Column(db.String)
+
 
 def create_app(database_uri):
     app = Flask(__name__)
@@ -22,12 +24,22 @@ def create_app(database_uri):
 
 app = create_app(database_uri='sqlite:////tmp/test.db')
 
+
 @app.route('/login', methods=['POST'])
 def login():
     email = request.form['email']
     password = request.form['password']
+
+    existing_users = User.query.filter_by(email=email)
+    if not existing_users.count():
+        return jsonify({}), codes.NOT_FOUND
+
+    if existing_users.first().password != password:
+        return jsonify({}), codes.UNAUTHORIZED
+
     response_content = {'email': email, 'password': password}
     return jsonify(response_content), codes.OK
+
 
 @app.route('/signup', methods=['POST'])
 def signup():
