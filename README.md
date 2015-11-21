@@ -44,5 +44,6 @@ signup
 * Automate API docs (maybe use a schema, sphinx)
 * name > email
 * hash passwords (Flask-Bcrypt)
+* Try a formatter (YAPF?)
 
 In the future this might hold other user details
