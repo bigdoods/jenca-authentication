@@ -32,6 +32,14 @@ class SignupTests(unittest.TestCase):
         response = self.app.post('/signup', data={})
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
 
+    def test_existing_user(self):
+        """
+        """
+        self.app.post('/signup', data=USER_DATA)
+        data = USER_DATA.copy()
+        data['password'] = 'different'
+        response = self.app.post('/signup', data=data)
+        self.assertEqual(response.status_code, codes.CONFLICT)
 
 class LoginTests(unittest.TestCase):
     """
