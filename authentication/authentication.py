@@ -7,11 +7,22 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
+    """
+    A user has an email and password.
+    """
     email = db.Column(db.String, primary_key=True)
     password = db.Column(db.String)
 
 
 def create_app(database_uri):
+    """
+    Create an application with a database in a given location.
+
+    :param database_uri: The location of the database for the application.
+    :type database_uri: string
+    :return: An application instance.
+    :rtype: ``Flask``
+    """
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
@@ -27,6 +38,12 @@ app = create_app(database_uri='sqlite:////tmp/test.db')
 
 @app.route('/login', methods=['POST'])
 def login():
+    """
+    Login API endpoint.
+
+    Return an OK status code and user details if a user with the given email
+    and password exists, else give an appropriate error code.
+    """
     email = request.form['email']
     password = request.form['password']
 
@@ -43,6 +60,12 @@ def login():
 
 @app.route('/signup', methods=['POST'])
 def signup():
+    """
+    Signup API endpoint.
+
+    Return an OK status code and user details if a user with the given email
+    and password does not exist, else give an appropriate error code.
+    """
     email = request.form['email']
     password = request.form['password']
 
