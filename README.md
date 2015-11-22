@@ -32,7 +32,8 @@ $ 192.168.99.100
 $ curl -X POST \
   -g '192.168.99.100:5000/signup' \
   -d email='user@example.com' \
-  -d password='secret'
+  -d password='secret' \
+  -c ~/Desktop/my_cookie
 ```
 
 ## Development
@@ -45,4 +46,5 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 
 ## TODO
 
-* Use a login manager, maybe https://flask-login.readthedocs.org/en/latest/
+* Better persistence of the database with Docker volumes
+* Better auth tokens https://flask-login.readthedocs.org/en/latest/#remember-me
