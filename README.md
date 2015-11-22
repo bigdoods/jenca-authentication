@@ -51,3 +51,4 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 * Perhaps login should happen after signup, this should be factored out.
 * API responses should have good messages, data, not just status codes
 * Automated, good API docs (instead of this terrible README solution)
+* Validate schema of JSON, e.g. with https://github.com/mattupstate/flask-jsonschema or http://pythonhosted.org/Flask-Inputs/
