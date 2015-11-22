@@ -39,10 +39,7 @@ This service is written using Python and [Flask](http://flask.pocoo.org).
 
 To start developing quickly, it is recommended that you create a `virtualenv` and install the requirements and run the tests as is done in `.travis.yml`.
 
-### Tests
-
 Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authentication).
-See `.travis.yml` for details on how the tests are run.
 
 ## TODO
 
