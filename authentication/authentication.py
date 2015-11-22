@@ -62,8 +62,11 @@ login_manager.init_app(app)
 def load_user(userid):
     """
     Flask-Login user_loader callback.
-    The user_loader function asks this function to get a User Object or return
-    None based on the userid.
+
+    The user_loader function asks this function to get a User object based on
+    the userid. If there is no user with the current userid (where userid is
+    the result of ``User.get_id``), return None.
+
     The userid was stored in the session environment by Flask-Login.
     user_loader stores the returned User object in current_user during every
     flask request.
