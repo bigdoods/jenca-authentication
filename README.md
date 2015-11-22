@@ -6,38 +6,42 @@
 
 # jenca-authentication
 
-Authentication service for Jenca Cloud
-Python service with login and signup
+An authentication service for Jenca Cloud.
 
-## Development
+## API
 
-The requirements for running this are:
-* Docker (with docker-machine and docker-compose) (probably you can use the Jenca Cloud Vagrant development environment)
+`/login` takes `email` and `password`.
+`/signup` takes `email` and `password`.
 
-For development you need Python and to install the requirements
+## Running this service
 
-Uses Flask http://flask.pocoo.org
+This comes with a [Docker Compose](https://docs.docker.com/compose/) file. 
 
-Start the API service:
+With Docker Compose available, perhaps in the Jenca Cloud Vagrant development environment, run:
 
 ```
 docker-compose build
 docker-compose up
 ```
 
-On OS X with Docker machine I've been running:
+to start the API service.
+
+To run commands against the API, n OS X with Docker Machine for example:
 
 ```
 $ docker-machine ip dev
 $ 192.168.99.100
-$ curl 192.168.99.100:5000/login
+$ curl -X POST \
+  -g '192.168.99.100:5000/signup' \
+  -d email='user@example.com' \
+  -d password='secret'
 ```
 
-for example
+## Development
 
-Current commands:
-login
-signup
+This service is written using Python and [Flask](http://flask.pocoo.org).
+
+To start developing quickly, it is recommended that you create a `virtualenv` and install the requirements and run the tests as is done in `.travis.yml`.
 
 ### Tests
 
@@ -48,9 +52,7 @@ See `.travis.yml` for details on how the tests are run.
 
 * Use a login manager, maybe https://flask-login.readthedocs.org/en/latest/
 * Automate API docs (maybe use a schema, sphinx)
-* hash passwords (Flask-Bcrypt)
+* Hash passwords (Flask-Bcrypt)
 * Try a formatter (YAPF?)
 * Lint markdown
 * Docstrings
-
-In the future this might hold other user details
