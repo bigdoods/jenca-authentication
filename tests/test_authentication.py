@@ -34,7 +34,6 @@ class SignupTests(unittest.TestCase):
         self.assertEqual(response.status_code, codes.CREATED)
         self.assertEqual(json.loads(response.data), USER_DATA)
 
-
     def test_missing_data(self):
         """
         A signup request without a username or password returns a BAD_REQUEST.
