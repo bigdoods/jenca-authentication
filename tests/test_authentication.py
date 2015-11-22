@@ -2,6 +2,7 @@ import json
 import unittest
 
 from requests import codes
+from werkzeug.http import parse_cookie
 
 from authentication.authentication import app, db, User, bcrypt
 
@@ -108,6 +109,21 @@ class LoginTests(unittest.TestCase):
         data['password'] = 'incorrect'
         response = self.app.post('/login', data=data)
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
+
+    def test_remember_me_cookie_set(self):
+        """
+        A "Remember Me" token is in the response header of a successful login.
+        """
+        self.app.post('/signup', data=USER_DATA)
+        response = self.app.post('/login', data=USER_DATA)
+        cookies = response.headers.getlist('Set-Cookie')
+
+        items = [parse_cookie(cookie).items()[0] for cookie in cookies]
+        token = ('remember_token',
+                 (u'alice@example.com|7f333e16d9fd51345154f42a6eb455f18ba77e2'
+                 '990acb119ffc5884a3cf18495ee6977dd61eda801d39c65f746eec51b77'
+                 'c49ccdd40acb093382d50ab5a9550c'))
+        self.assertIn(token, items)
 
     def tearDown(self):
         with app.app_context():
