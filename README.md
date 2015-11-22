@@ -48,5 +48,4 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 
 * Better persistence of the database with Docker volumes.
 * Better auth tokens, see https://flask-login.readthedocs.org/en/latest/#remember-me.
-* The test classes share setUp and tearDown methods. This should be factored out.
 * Perhaps login should happen after signup, this should be factored out.

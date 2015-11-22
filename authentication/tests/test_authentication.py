@@ -6,23 +6,32 @@ from werkzeug.http import parse_cookie
 
 from authentication.authentication import app, db, User, bcrypt
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
-
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
-class SignupTests(unittest.TestCase):
+class APITestCase(unittest.TestCase):
     """
-    Tests for the user sign up endpoint at ``/signup``.
+    Set up and tear down an application with an in memory database for testing.
     """
 
     def setUp(self):
         app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         self.app = app.test_client()
 
         with app.app_context():
             db.create_all()
+
+    def tearDown(self):
+        with app.app_context():
+            db.session.remove()
+            db.drop_all()
+
+
+class SignupTests(APITestCase):
+    """
+    Tests for the user sign up endpoint at ``/signup``.
+    """
 
     def test_signup(self):
         """
@@ -63,24 +72,11 @@ class SignupTests(unittest.TestCase):
         response = self.app.post('/signup', data=data)
         self.assertEqual(response.status_code, codes.CONFLICT)
 
-    def tearDown(self):
-        with app.app_context():
-            db.session.remove()
-            db.drop_all()
 
-
-class LoginTests(unittest.TestCase):
+class LoginTests(APITestCase):
     """
     Tests for the user log in endpoint at ``/login``.
     """
-
-    def setUp(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-        self.app = app.test_client()
-
-        with app.app_context():
-            db.create_all()
 
     def test_login(self):
         """
@@ -123,24 +119,11 @@ class LoginTests(unittest.TestCase):
         email, user_id = headers_dict['remember_token'].split('|')
         self.assertEqual(email, USER_DATA['email'])
 
-    def tearDown(self):
-        with app.app_context():
-            db.session.remove()
-            db.drop_all()
 
-
-class LogoutTests(unittest.TestCase):
+class LogoutTests(APITestCase):
     """
     Tests for the user log out endpoint at ``/logout``.
     """
-
-    def setUp(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-        self.app = app.test_client()
-
-        with app.app_context():
-            db.create_all()
 
     def test_logout(self):
         """
@@ -170,8 +153,3 @@ class LogoutTests(unittest.TestCase):
         self.app.post('/logout')
         response = self.app.post('/logout')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
-
-    def tearDown(self):
-        with app.app_context():
-            db.session.remove()
-            db.drop_all()
