@@ -50,5 +50,6 @@ See `.travis.yml` for details on how the tests are run.
 * Coverage (with badge)
 * Try a formatter (YAPF?)
 * Lint markdown
+* Docstrings
 
 In the future this might hold other user details

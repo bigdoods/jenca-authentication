@@ -9,7 +9,7 @@ install:
 before_script:
   - "flake8 ."
 script:
-  - "coverage run -m unittest discover"
+  - "coverage run --source=authentication -m unittest discover"
 after_success:
   - "coveralls"
 cache:

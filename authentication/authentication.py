@@ -52,6 +52,7 @@ def signup():
     user = User(email=email, password=password)
     db.session.add(user)
     db.session.commit()
+
     response_content = {'email': email, 'password': password}
     return jsonify(response_content), codes.CREATED
 
