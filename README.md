@@ -44,4 +44,3 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 ## TODO
 
 * Use a login manager, maybe https://flask-login.readthedocs.org/en/latest/
-* Persistent docker volume for database

@@ -3,4 +3,5 @@ web:
   ports:
    # HOST:CONTAINER
    - "5000:5000"
-
+  volumes:
+   - ".:/authentication"

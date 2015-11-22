@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, jsonify, request
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -34,7 +36,9 @@ def create_app(database_uri):
 
     return app
 
-app = create_app(database_uri='sqlite:////tmp/authentication.db')
+basedir = os.path.abspath(os.path.dirname(__file__))
+SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
 bcrypt = Bcrypt(app)
 
 
