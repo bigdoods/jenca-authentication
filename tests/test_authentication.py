@@ -114,7 +114,12 @@ class LoginTests(unittest.TestCase):
             db.session.remove()
             db.drop_all()
 
+
 class LogoutTests(unittest.TestCase):
+    """
+    Tests for the user log out endpoint at ``/logout``.
+    """
+
     def setUp(self):
         app.config['TESTING'] = True
         app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
@@ -124,12 +129,31 @@ class LogoutTests(unittest.TestCase):
             db.create_all()
 
     def test_logout(self):
+        """
+        A POST request to log out when a user is logged in returns an OK status
+        code.
+        """
         self.app.post('/signup', data=USER_DATA)
         self.app.post('/login', data=USER_DATA)
         response = self.app.post('/logout')
         self.assertEqual(response.status_code, codes.OK)
 
     def test_not_logged_in(self):
+        """
+        A POST request to log out when no user is logged in returns an
+        UNAUTHORIZED status code.
+        """
+        response = self.app.post('/logout')
+        self.assertEqual(response.status_code, codes.UNAUTHORIZED)
+
+    def test_logout_twice(self):
+        """
+        A POST request to log out, after a successful log out attempt returns
+        an UNAUTHORIZED status code.
+        """
+        self.app.post('/signup', data=USER_DATA)
+        self.app.post('/login', data=USER_DATA)
+        self.app.post('/logout')
         response = self.app.post('/logout')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
 
