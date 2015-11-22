@@ -50,8 +50,8 @@ def create_app(database_uri):
 
     return app
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
+SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
+                                         'sqlite:///:memory:')
 app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()

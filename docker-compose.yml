@@ -4,4 +4,6 @@ web:
    # HOST:CONTAINER
    - "5000:5000"
   volumes:
-   - ".:/authentication"
+   - /tmp/authentication:/data
+  environment:
+   - SQLALCHEMY_DATABASE_URI=sqlite:////data/authentication.db
