@@ -1,5 +1,8 @@
 web:
   build: .
   ports:
+   # HOST:CONTAINER
    - "5000:5000"
-
+  volumes:
+   # HOST:CONTAINER
+   - "/var/lib/sqlite"

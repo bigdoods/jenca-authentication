@@ -48,7 +48,4 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 * Hash passwords (Flask-Bcrypt)
 * Try a formatter (YAPF?)
 * Lint markdown
-* Docstrings
 * Logging
-* Use Docker volumes for the database
-* Choose somewhere suitable for the database

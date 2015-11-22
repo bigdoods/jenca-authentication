@@ -5,7 +5,6 @@ from requests import codes
 
 from authentication.authentication import app, db
 
-# TODO Put this in a temporary test folder
 SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/unit_test.db"
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
