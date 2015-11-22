@@ -119,11 +119,9 @@ class LoginTests(unittest.TestCase):
         cookies = response.headers.getlist('Set-Cookie')
 
         items = [parse_cookie(cookie).items()[0] for cookie in cookies]
-        token = ('remember_token',
-                 (u'alice@example.com|7f333e16d9fd51345154f42a6eb455f18ba77e2'
-                 '990acb119ffc5884a3cf18495ee6977dd61eda801d39c65f746eec51b77'
-                 'c49ccdd40acb093382d50ab5a9550c'))
-        self.assertIn(token, items)
+        headers_dict = {key: value for key, value in items}
+        email, user_id = headers_dict['remember_token'].split('|')
+        self.assertEqual(email, USER_DATA['email'])
 
     def tearDown(self):
         with app.app_context():
