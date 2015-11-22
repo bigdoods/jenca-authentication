@@ -33,7 +33,7 @@ def create_app(database_uri):
 
     return app
 
-app = create_app(database_uri='sqlite:////var/lib/sqlite/authentication.db')
+app = create_app(database_uri='sqlite:////tmp/authentication.db')
 
 
 @app.route('/login', methods=['POST'])
