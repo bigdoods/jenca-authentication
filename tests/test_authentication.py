@@ -113,3 +113,27 @@ class LoginTests(unittest.TestCase):
         with app.app_context():
             db.session.remove()
             db.drop_all()
+
+class LogoutTests(unittest.TestCase):
+    def setUp(self):
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+        self.app = app.test_client()
+
+        with app.app_context():
+            db.create_all()
+
+    def test_logout(self):
+        self.app.post('/signup', data=USER_DATA)
+        self.app.post('/login', data=USER_DATA)
+        response = self.app.post('/logout')
+        self.assertEqual(response.status_code, codes.OK)
+
+    def test_not_logged_in(self):
+        response = self.app.post('/logout')
+        self.assertEqual(response.status_code, codes.UNAUTHORIZED)
+
+    def tearDown(self):
+        with app.app_context():
+            db.session.remove()
+            db.drop_all()

@@ -2,19 +2,34 @@ import os
 
 from flask import Flask, jsonify, request
 from flask.ext.bcrypt import Bcrypt
+from flask.ext.login import LoginManager, UserMixin, login_user, logout_user, login_required
 from flask.ext.sqlalchemy import SQLAlchemy
 
+# from itsdangerous import URLSafeTimedSerializer
 from requests import codes
 
 db = SQLAlchemy()
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     """
     A user has an email and password.
     """
     email = db.Column(db.String, primary_key=True)
     password_hash = db.Column(db.String)
+    #
+    # def get_auth_token(self):
+    #     """
+    #     Encode a secure token for cookie.
+    #     This is required by Flask-Login.
+    #     """
+    #     return login_serializer.dumps([self.email, self.password_hash])
+
+    def get_id(self):
+        """
+        Return the email address to satify Flask-Login's requirements.
+        """
+        return self.email
 
 
 def create_app(database_uri):
@@ -28,6 +43,7 @@ def create_app(database_uri):
     """
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
+    app.config['SECRET_KEY'] = 'secret'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     db.init_app(app)
 
@@ -40,6 +56,25 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
 bcrypt = Bcrypt(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+# Login_serializer used to encryt and decrypt the cookie token for the Remember
+# Me option of flask-login
+# login_serializer = URLSafeTimedSerializer(app.secret_key)
+
+
+@login_manager.user_loader
+def load_user(userid):
+    """
+    Flask-Login user_loader callback.
+    The user_loader function asks this function to get a User Object or return
+    None based on the userid.
+    The userid was stored in the session environment by Flask-Login.
+    user_loader stores the returned User object in current_user during every
+    flask request.
+    """
+    return User.query.filter_by(email=userid).first()
 
 
 @app.route('/login', methods=['POST'])
@@ -57,12 +92,22 @@ def login():
     if not existing_users.count():
         return jsonify({}), codes.NOT_FOUND
 
-    password_hash = existing_users.first().password_hash
-    if not bcrypt.check_password_hash(password_hash, password):
+    user = existing_users.first()
+
+    if not bcrypt.check_password_hash(user.password_hash, password):
         return jsonify({}), codes.UNAUTHORIZED
+
+    login_user(user, remember=False)
 
     response_content = {'email': email, 'password': password}
     return jsonify(response_content), codes.OK
+
+
+@app.route('/logout', methods=['POST'])
+@login_required
+def logout():
+    logout_user()
+    return jsonify({}), codes.OK
 
 
 @app.route('/signup', methods=['POST'])
@@ -76,7 +121,7 @@ def signup():
     email = request.form['email']
     password = request.form['password']
 
-    if User.query.filter_by(email=email).count():
+    if load_user(email) is not None:
         return jsonify({}), codes.CONFLICT
 
     password_hash = bcrypt.generate_password_hash(password)

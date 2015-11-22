@@ -6,8 +6,10 @@ An authentication service for Jenca Cloud.
 
 ## API
 
-`/login` takes `email` and `password`.
-`/signup` takes `email` and `password`.
+* `/login` takes `email` and `password`.
+* `/signup` takes `email` and `password`.
+* `/logout`.
+
 
 ## Running this service
 
