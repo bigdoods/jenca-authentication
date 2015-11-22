@@ -26,8 +26,8 @@ class SignupTests(unittest.TestCase):
 
     def test_signup(self):
         """
-        A signup request with a username and password returns a JSON response
-        with user credentials and a CREATED status.
+        A signup ``POST`` request with an email address and password returns a
+        JSON response with user credentials and a CREATED status.
         """
         response = self.app.post('/signup', data=USER_DATA)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -36,13 +36,16 @@ class SignupTests(unittest.TestCase):
 
     def test_missing_data(self):
         """
-        A signup request without a username or password returns a BAD_REQUEST.
+        A signup request without an email address or password returns a
+        BAD_REQUEST status code.
         """
         response = self.app.post('/signup', data={})
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
 
     def test_existing_user(self):
         """
+        A signup request for an email address which already exists returns a
+        CONFLICT status code.
         """
         self.app.post('/signup', data=USER_DATA)
         data = USER_DATA.copy()
@@ -69,18 +72,29 @@ class LoginTests(unittest.TestCase):
         with app.app_context():
             db.create_all()
 
-        self.app.post('/signup', data=USER_DATA)
-
     def test_login(self):
+        """
+        Logging in as a user which has been signed up returns an OK status
+        code.
+        """
+        self.app.post('/signup', data=USER_DATA)
         response = self.app.post('/login', data=USER_DATA)
         self.assertEqual(response.status_code, codes.OK)
 
     def test_login_non_existant(self):
-        non_existant_user = {'email': 'fake@example.com', 'password': 'secret'}
-        response = self.app.post('/login', data=non_existant_user)
+        """
+        Attempting to log in as a user which has been not been signed up
+        returns a NOT_FOUND status code.
+        """
+        response = self.app.post('/login', data=USER_DATA)
         self.assertEqual(response.status_code, codes.NOT_FOUND)
 
     def test_login_wrong_password(self):
+        """
+        Attempting to log in with an incorrect password returns an UNAUTHORIZED
+        status code.
+        """
+        self.app.post('/signup', data=USER_DATA)
         data = USER_DATA.copy()
         data['password'] = 'incorrect'
         response = self.app.post('/login', data=data)
