@@ -118,7 +118,7 @@ class LoginTests(unittest.TestCase):
         response = self.app.post('/login', data=USER_DATA)
         cookies = response.headers.getlist('Set-Cookie')
 
-        items = [parse_cookie(cookie).items()[0] for cookie in cookies]
+        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
         headers_dict = {key: value for key, value in items}
         email, user_id = headers_dict['remember_token'].split('|')
         self.assertEqual(email, USER_DATA['email'])
