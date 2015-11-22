@@ -52,3 +52,4 @@ See `.travis.yml` for details on how the tests are run.
 * Try a formatter (YAPF?)
 * Lint markdown
 * Docstrings
+* Logging
