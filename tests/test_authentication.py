@@ -5,7 +5,7 @@ from requests import codes
 
 from authentication.authentication import app, db, User, bcrypt
 
-SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/unit_test.db"
+SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
