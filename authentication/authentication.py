@@ -25,7 +25,8 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         """
-        Return the email address to satify Flask-Login's requirements.
+        Return the email address to satify Flask-Login's requirements. This is
+        used in conjunction with ``load_user`` for session management
         """
         return self.email
 
