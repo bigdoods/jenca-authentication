@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request
+from flask.ext.bcrypt import Bcrypt
 from flask.ext.sqlalchemy import SQLAlchemy
 
 from requests import codes
@@ -11,7 +12,7 @@ class User(db.Model):
     A user has an email and password.
     """
     email = db.Column(db.String, primary_key=True)
-    password = db.Column(db.String)
+    password_hash = db.Column(db.String)
 
 
 def create_app(database_uri):
@@ -34,6 +35,7 @@ def create_app(database_uri):
     return app
 
 app = create_app(database_uri='sqlite:////tmp/authentication.db')
+bcrypt = Bcrypt(app)
 
 
 @app.route('/login', methods=['POST'])
@@ -51,7 +53,8 @@ def login():
     if not existing_users.count():
         return jsonify({}), codes.NOT_FOUND
 
-    if existing_users.first().password != password:
+    password_hash = existing_users.first().password_hash
+    if not bcrypt.check_password_hash(password_hash, password):
         return jsonify({}), codes.UNAUTHORIZED
 
     response_content = {'email': email, 'password': password}
@@ -72,7 +75,8 @@ def signup():
     if User.query.filter_by(email=email).count():
         return jsonify({}), codes.CONFLICT
 
-    user = User(email=email, password=password)
+    password_hash = bcrypt.generate_password_hash(password)
+    user = User(email=email, password_hash=password_hash)
     db.session.add(user)
     db.session.commit()
 

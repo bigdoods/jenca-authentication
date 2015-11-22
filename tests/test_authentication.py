@@ -3,7 +3,7 @@ import unittest
 
 from requests import codes
 
-from authentication.authentication import app, db
+from authentication.authentication import app, db, User, bcrypt
 
 SQLALCHEMY_DATABASE_URI = "sqlite:////tmp/unit_test.db"
 
@@ -32,6 +32,16 @@ class SignupTests(unittest.TestCase):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.CREATED)
         self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
+
+    def test_passwords_hashed(self):
+        """
+        Passwords are hashed before being saved to the database.
+        """
+        self.app.post('/signup', data=USER_DATA)
+        with app.app_context():
+            user = User.query.filter_by(email=USER_DATA['email']).first()
+        self.assertTrue(bcrypt.check_password_hash(user.password_hash,
+                                                   USER_DATA['password']))
 
     def test_missing_data(self):
         """
