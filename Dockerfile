@@ -13,5 +13,3 @@ ADD . /authentication
 # 5000 is the default port which Flask runs on, but this might not be suitable
 # in production.
 EXPOSE 5000
-
-CMD python authentication/authentication.py
