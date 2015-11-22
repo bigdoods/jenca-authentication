@@ -3,7 +3,12 @@ import os
 from flask import Flask, jsonify, request
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import (
-    LoginManager, UserMixin, login_user, logout_user, login_required)
+    LoginManager,
+    login_required,
+    login_user,
+    logout_user,
+    UserMixin,
+)
 from flask.ext.sqlalchemy import SQLAlchemy
 
 from requests import codes
@@ -86,7 +91,7 @@ def login():
     if not bcrypt.check_password_hash(user.password_hash, password):
         return jsonify({}), codes.UNAUTHORIZED
 
-    login_user(user, remember=False)
+    login_user(user, remember=True)
 
     response_content = {'email': email, 'password': password}
     return jsonify(response_content), codes.OK
