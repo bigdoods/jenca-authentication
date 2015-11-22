@@ -2,10 +2,10 @@ import os
 
 from flask import Flask, jsonify, request
 from flask.ext.bcrypt import Bcrypt
-from flask.ext.login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask.ext.login import (
+    LoginManager, UserMixin, login_user, logout_user, login_required)
 from flask.ext.sqlalchemy import SQLAlchemy
 
-# from itsdangerous import URLSafeTimedSerializer
 from requests import codes
 
 db = SQLAlchemy()
@@ -17,13 +17,6 @@ class User(db.Model, UserMixin):
     """
     email = db.Column(db.String, primary_key=True)
     password_hash = db.Column(db.String)
-    #
-    # def get_auth_token(self):
-    #     """
-    #     Encode a secure token for cookie.
-    #     This is required by Flask-Login.
-    #     """
-    #     return login_serializer.dumps([self.email, self.password_hash])
 
     def get_id(self):
         """
@@ -58,10 +51,6 @@ app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-# Login_serializer used to encryt and decrypt the cookie token for the Remember
-# Me option of flask-login
-# login_serializer = URLSafeTimedSerializer(app.secret_key)
 
 
 @login_manager.user_loader
@@ -106,6 +95,9 @@ def login():
 @app.route('/logout', methods=['POST'])
 @login_required
 def logout():
+    """
+    Log the current user out.
+    """
     logout_user()
     return jsonify({}), codes.OK
 
