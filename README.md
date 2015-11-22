@@ -44,8 +44,4 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 ## TODO
 
 * Use a login manager, maybe https://flask-login.readthedocs.org/en/latest/
-* Automate API docs (maybe use a schema, sphinx)
-* Try a formatter (YAPF?)
-* Lint markdown
-* Logging
 * Persistent docker volume for database
