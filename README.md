@@ -47,6 +47,7 @@ See `.travis.yml` for details on how the tests are run.
 * Use a login manager, maybe https://flask-login.readthedocs.org/en/latest/
 * Automate API docs (maybe use a schema, sphinx)
 * hash passwords (Flask-Bcrypt)
+* Coverage (with badge)
 * Try a formatter (YAPF?)
 * Lint markdown
 
