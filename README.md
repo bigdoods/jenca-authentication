@@ -1,6 +1,7 @@
 [![Requirements Status](https://requires.io/github/jenca-cloud/jenca-authentication/requirements.svg?branch=master)](https://requires.io/github/jenca-cloud/jenca-authentication/requirements/?branch=master)
 
 [![Build Status](https://travis-ci.org/jenca-cloud/jenca-authentication.svg?branch=master)](https://travis-ci.org/jenca-cloud/jenca-authentication)
+
 # jenca-authentication
 
 Authentication service for Jenca Cloud
@@ -36,12 +37,17 @@ Current commands:
 login
 signup
 
+### Tests
+
+Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authentication).
+See `.travis.yml` for details on how the tests are run.
+
 ## TODO
 
 * Use a login manager, maybe https://flask-login.readthedocs.org/en/latest/
-* Flake8
 * Automate API docs (maybe use a schema, sphinx)
 * hash passwords (Flask-Bcrypt)
 * Try a formatter (YAPF?)
+* Lint markdown
 
 In the future this might hold other user details
