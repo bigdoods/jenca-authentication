@@ -10,5 +10,5 @@ setup(
     packages=find_packages(),
     install_requires=[str(requirement.req) for requirement in
                       parse_requirements('requirements.txt',
-                          session=uuid.uuid1())],
+                                         session=uuid.uuid1())],
 )
