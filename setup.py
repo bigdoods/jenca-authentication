@@ -19,6 +19,8 @@ setup(
             "flake8",
             # Build documentation:
             "Sphinx",
+            # Style check documentation:
+            "doc8",
         ],
     },
 )
