@@ -6,9 +6,7 @@ python:
   - "2.7"
   - "3.5"
 install:
-  - "pip install flake8"
-  - "pip install coveralls"
-  - "pip install -r requirements.txt"
+  - "pip install -e .[dev]"
 before_script:
   # Run various code analysis tools, for linting and correctness.
   - "flake8 ."
