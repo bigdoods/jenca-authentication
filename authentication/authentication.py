@@ -78,7 +78,7 @@ def load_user(userid):
 @app.route('/login', methods=['POST'])
 def login():
     """
-    Login API endpoint.
+    Log in a given user.
 
     :param email: An email address to log in as.
     :type email: string
@@ -114,7 +114,7 @@ def login():
 @login_required
 def logout():
     """
-    Log the current user out.
+    Log the current user out API .
     """
     logout_user()
     return jsonify({}), codes.OK
@@ -123,7 +123,7 @@ def logout():
 @app.route('/signup', methods=['POST'])
 def signup():
     """
-    Signup API endpoint.
+    Sign up a new user.
 
     Return an OK status code and user details if a user with the given email
     and password does not exist, else give an appropriate error code.
