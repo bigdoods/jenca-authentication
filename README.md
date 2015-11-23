@@ -44,6 +44,29 @@ To start developing quickly, it is recommended that you create a `virtualenv` an
 
 Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authentication).
 
+
+## Documentation
+
+The full documentation for this service can be seen at XXX.
+
+To build the documentation locally, install the development requirements in a virtualenv:
+
+```
+(my_virtualenv)$ pip install -r dev-requirements.txt
+```
+
+and then use the Makefile in the `docs/` directory:
+
+```
+(my_virtualenv)$ make -C docs/ html
+```
+
+To view this build documentation, run:
+
+```
+$ open docs/build/html/index.html
+```
+
 ## TODO
 
 * Better persistence of the database with Docker volumes.
