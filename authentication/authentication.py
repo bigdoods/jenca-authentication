@@ -80,8 +80,14 @@ def login():
     """
     Login API endpoint.
 
-    Return an OK status code and user details if a user with the given email
-    and password exists, else give an appropriate error code.
+    :param email: An email address to log in as.
+    :type email: string
+    :param password: A password associated with the given ``email`` address.
+    :type password: string
+    :resheader Content-Type: application/json
+    :status 200: A ``User`` with the given ``email`` has been logged in.
+    :status 404: No user can be found with the given ``email``.
+    :status 401: The given ``password`` is incorrect.
     """
     email = request.form['email']
     password = request.form['password']
