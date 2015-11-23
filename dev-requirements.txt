@@ -1,5 +1,5 @@
-coverage
-doc8
-flake8
-Sphinx
-sphinxcontrib-httpdomain
+coverage # Allows us to measure code coverage
+doc8 # Style check documentation
+flake8 # Code analysis tool with linting
+Sphinx # Build documentation
+sphinxcontrib-httpdomain # Describe RESTful HTTP APIs in Sphinx
