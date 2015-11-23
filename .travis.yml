@@ -13,7 +13,7 @@ before_script:
   # Style check the documentation:
   - "doc8 docs/"
 script:
-  # Build documentation HTML
+  # Build documentation HTML.
   - sphinx-build -W -v docs/source/ html
   # Run all discoverable tests, but set the source directory so that the coverage tool knows not to include coverage for all dependencies.
   - "coverage run --source=authentication -m unittest discover"
