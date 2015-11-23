@@ -15,3 +15,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+.. autoflask:: authentication.authentication:app
+   :undoc-static:

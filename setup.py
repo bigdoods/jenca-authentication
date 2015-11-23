@@ -15,12 +15,14 @@ setup(
         "dev": [
             # Allows us to measure code coverage:
             "coverage",
+            # Style check documentation:
+            "doc8",
             # Code analysis tool with linting:
             "flake8",
             # Build documentation:
             "Sphinx",
-            # Style check documentation:
-            "doc8",
+            # Describe RESTful HTTP APIs in Sphinx:
+            "sphinxcontrib-httpdomain",
         ],
     },
 )
