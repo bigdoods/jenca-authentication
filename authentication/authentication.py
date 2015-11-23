@@ -88,7 +88,7 @@ def login():
     :resjson string email: The email address which has been logged in.
     :resjson string password: The password of the user which has been logged
         in.
-    :status 200: A ``User`` with the given ``email`` has been logged in.
+    :status 200: A user with the given ``email`` has been logged in.
     :status 404: No user can be found with the given ``email``.
     :status 401: The given ``password`` is incorrect.
     """
@@ -125,8 +125,16 @@ def signup():
     """
     Sign up a new user.
 
-    Return an OK status code and user details if a user with the given email
-    and password does not exist, else give an appropriate error code.
+    :param email: The email address of the new user.
+    :type email: string
+    :param password: A password to associate with the given ``email`` address.
+    :type password: string
+    :resheader Content-Type: application/json
+    :resjson string email: The email address of the new user.
+    :resjson string password: The password of the new user.
+    :status 200: A user with the given ``email`` and ``password`` has been
+        created.
+    :status 409: There already exists a user with the given ``email``.
     """
     email = request.form['email']
     password = request.form['password']
