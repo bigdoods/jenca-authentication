@@ -1,0 +1,13 @@
+web:
+  build: .
+  ports:
+   # HOST:CONTAINER
+
+   # Flask defaults to listening on port 5000 but this is configurable.
+   # See http://flask.pocoo.org/docs/0.10/api/#flask.Flask.run
+   - "5000:5000"
+  volumes:
+   - /tmp/authentication:/data
+  environment:
+   - SQLALCHEMY_DATABASE_URI=sqlite:////data/authentication.db
+  command: python authentication/authentication.py
