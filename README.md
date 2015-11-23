@@ -53,3 +53,4 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 * Automated, good API docs (instead of this terrible README solution) probably sphinxcontrib.autohttp.flask
 * Validate schema of JSON, e.g. with https://github.com/mattupstate/flask-jsonschema or http://pythonhosted.org/Flask-Inputs/
 * Some kind of versioning system
+* Direct tests for load_user and get_id

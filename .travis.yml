@@ -1,5 +1,8 @@
 language: python
 python:
+  # These versions are semi-arbitrary. We have no need right now for two Python
+  # versions. They are the latest versions for the two languages (Python 2 and
+  # Python 3)
   - "2.7"
   - "3.5"
 install:
@@ -7,11 +10,17 @@ install:
   - "pip install coveralls"
   - "pip install -r requirements.txt"
 before_script:
+  # Run various code analysis tools, for linting and correctness.
   - "flake8 ."
 script:
+  # Run all discoverable tests, but set the source directory so that the coverage tool knows not to include coverage for all dependencies.
   - "coverage run --source=authentication -m unittest discover"
 after_success:
+  # Sends the coverage report to coveralls.io which can report to Pull Requests
+  # and track test coverage over time.
   - "coveralls"
+# Cache pip dependencies.
+# See http://docs.travis-ci.com/user/caching/#pip-cache.
 cache:
   directories:
     - $HOME/.cache/pip
