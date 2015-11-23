@@ -1,17 +1,16 @@
 from setuptools import setup, find_packages
 
+# We use requirements.txt files instead of just declaring the requirements here
+# because this helps with Docker package caching.
+with open("requirements.txt") as requirements:
+    install_requires = requirements.readlines()
+
 setup(
     name="Jenca_Authentication",
     version="0.1",
     description="Authenticate users for Jenca Cloud.",
     packages=find_packages(),
-    install_requires=[
-        'Flask==0.10.1',
-        'Flask-Login==0.3.2',
-        'Flask-Bcrypt==0.7.1',
-        'Flask-SQLAlchemy==2.1',
-        'requests==2.8.1',
-    ],
+    install_requires=install_requires,
     extras_require={
         "dev": [
             # Allows us to measure code coverage:
