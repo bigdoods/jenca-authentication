@@ -24,7 +24,7 @@ docker-compose up
 
 to start the API service.
 
-To run commands against the API, n OS X with Docker Machine for example:
+To run commands against the API, on OS X with Docker Machine for example:
 
 ```
 $ docker-machine ip dev
