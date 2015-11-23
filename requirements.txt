@@ -1,6 +1,0 @@
-Flask==0.10.1
-Flask-Login==0.3.2
-Flask-Bcrypt==0.7.1
-Flask-SQLAlchemy==2.1
-requests==2.8.1
-Sphinx==1.3.1 # TODO: Move to separate dev-requirements

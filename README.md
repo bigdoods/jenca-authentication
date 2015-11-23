@@ -40,7 +40,11 @@ $ curl -X POST \
 
 This service is written using Python and [Flask](http://flask.pocoo.org).
 
-To start developing quickly, it is recommended that you create a `virtualenv` and install the requirements and run the tests as is done in `.travis.yml`.
+To start developing quickly, it is recommended that you create a `virtualenv` and install the requirements and run the tests inside it:
+
+```
+(my_virtualenv)$ pip install -e .[dev]
+```
 
 Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authentication).
 
@@ -49,13 +53,7 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 
 The full documentation for this service can be seen at http://jenca-authentication.readthedocs.org/.
 
-To build the documentation locally, install the development requirements in a virtualenv:
-
-```
-(my_virtualenv)$ pip install -r dev-requirements.txt
-```
-
-and then use the Makefile in the `docs/` directory:
+To build the documentation locally, install the development requirements and then use the Makefile in the `docs/` directory:
 
 ```
 (my_virtualenv)$ make -C docs/ html
