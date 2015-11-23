@@ -47,7 +47,7 @@ Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authenticat
 
 ## Documentation
 
-The full documentation for this service can be seen at XXX.
+The full documentation for this service can be seen at http://jenca-authentication.readthedocs.org/.
 
 To build the documentation locally, install the development requirements in a virtualenv:
 
