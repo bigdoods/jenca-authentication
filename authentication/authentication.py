@@ -85,6 +85,9 @@ def login():
     :param password: A password associated with the given ``email`` address.
     :type password: string
     :resheader Content-Type: application/json
+    :resjson string email: The email address which has been logged in.
+    :resjson string password: The password of the user which has been logged
+        in.
     :status 200: A ``User`` with the given ``email`` has been logged in.
     :status 404: No user can be found with the given ``email``.
     :status 401: The given ``password`` is incorrect.
