@@ -190,6 +190,8 @@ class UserTests(DatabaseTestCase):
         ``User.get_id`` returns the email of a ``User``. This is required by
         Flask-Login as a unique identifier.
         """
+        user = User(email='email', password_hash='password_hash')
+        self.assertEqual(user.get_id(), 'email')
 
     def test_email_unique(self):
         """
