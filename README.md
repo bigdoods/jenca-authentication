@@ -4,11 +4,7 @@
 
 An authentication service for Jenca Cloud.
 
-## API
-
-* `/login` takes `email` and `password`.
-* `/signup` takes `email` and `password`.
-* `/logout`.
+The full documentation for this service can be seen at http://jenca-authentication.readthedocs.org/.
 
 
 ## Running this service
@@ -49,9 +45,7 @@ To start developing quickly, it is recommended that you create a `virtualenv` an
 Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authentication).
 
 
-## Documentation
-
-The full documentation for this service can be seen at http://jenca-authentication.readthedocs.org/.
+### Documentation
 
 To build the documentation locally, install the development requirements and then use the Makefile in the `docs/` directory:
 
@@ -75,4 +69,3 @@ $ open docs/build/html/index.html
 * Some kind of versioning system
 * Direct tests for `load_user` and `get_id`
 * Flesh out setup.py
-
