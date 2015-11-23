@@ -114,7 +114,10 @@ def login():
 @login_required
 def logout():
     """
-    Log the current user out API .
+    Log the current user out.
+
+    :resheader Content-Type: application/json
+    :status 200: The current user has been logged out.
     """
     logout_user()
     return jsonify({}), codes.OK
