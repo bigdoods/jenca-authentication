@@ -1,5 +1,5 @@
-Welcome to Jenca Authentication's documentation!
-================================================
+Jenca Authentication
+====================
 
 API Endpoints
 -------------
