@@ -4,12 +4,12 @@ import unittest
 from requests import codes
 from werkzeug.http import parse_cookie
 
-from authentication.authentication import app, db, User, bcrypt
+from authentication.authentication import app, db, User, bcrypt, load_user
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
-class APITestCase(unittest.TestCase):
+class DatabaseTestCase(unittest.TestCase):
     """
     Set up and tear down an application with an in memory database for testing.
     """
@@ -28,7 +28,7 @@ class APITestCase(unittest.TestCase):
             db.drop_all()
 
 
-class SignupTests(APITestCase):
+class SignupTests(DatabaseTestCase):
     """
     Tests for the user sign up endpoint at ``/signup``.
     """
@@ -73,7 +73,7 @@ class SignupTests(APITestCase):
         self.assertEqual(response.status_code, codes.CONFLICT)
 
 
-class LoginTests(APITestCase):
+class LoginTests(DatabaseTestCase):
     """
     Tests for the user log in endpoint at ``/login``.
     """
@@ -120,7 +120,7 @@ class LoginTests(APITestCase):
         self.assertEqual(email, USER_DATA['email'])
 
 
-class LogoutTests(APITestCase):
+class LogoutTests(DatabaseTestCase):
     """
     Tests for the user log out endpoint at ``/logout``.
     """
@@ -153,3 +153,27 @@ class LogoutTests(APITestCase):
         self.app.post('/logout')
         response = self.app.post('/logout')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
+
+
+class LoadUserTests(DatabaseTestCase):
+    """
+    Tests for ``load_user``, which is a function required by Flask-Login.
+    """
+
+    def test_user_exists(self):
+        """
+        If a user exists with the email given as the user ID to ``load_user``,
+        that user is returned.
+        """
+        self.app.post('/signup', data=USER_DATA)
+        with app.app_context():
+            self.assertEqual(load_user(user_id=USER_DATA['email']),
+                             User(email=USER_DATA['email']))
+
+    def test_user_does_not_exist(self):
+        """
+        If no user exists with the email given as the user ID to ``load_user``,
+        ``None`` is returned.
+        """
+        with app.app_context():
+            self.assertIsNone(load_user(user_id='email'))
