@@ -14,9 +14,11 @@ before_script:
   - "doc8 docs/"
 script:
   # Build documentation HTML.
-  - sphinx-build -W -v docs/source/ html
-  # Check that links in the docs work.
-  - make -C docs/ linkcheck
+  - sphinx-build -W -b html -d build/doctrees docs/source build/html
+  # Check that links in the documentation work.
+  - sphinx-build -W -b linkcheck -d build/doctrees docs/source build/linkcheck
+  # Check spelling in the documentation.
+  - sphinx-build -W -b spelling -d build/doctrees docs/source build/spelling
   # Run all discoverable tests, but set the source directory so that the coverage tool knows not to include coverage for all dependencies.
   - "coverage run --source=authentication -m unittest discover"
 after_success:
