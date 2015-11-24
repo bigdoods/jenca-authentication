@@ -5,7 +5,13 @@ from flask.ext.sqlalchemy import orm
 from requests import codes
 from werkzeug.http import parse_cookie
 
-from authentication.authentication import app, db, User, bcrypt, load_user
+from authentication.authentication import (
+    app,
+    bcrypt,
+    db,
+    load_user_from_id,
+    User,
+)
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
@@ -109,7 +115,8 @@ class LoginTests(DatabaseTestCase):
 
     def test_remember_me_cookie_set(self):
         """
-        A "Remember Me" token is in the response header of a successful login.
+        A "Remember Me" token is in the response header of a successful login
+        with the value of ``User.get_auth_token`` for the logged in user.
         """
         self.app.post('/signup', data=USER_DATA)
         response = self.app.post('/login', data=USER_DATA)
@@ -117,8 +124,10 @@ class LoginTests(DatabaseTestCase):
 
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
         headers_dict = {key: value for key, value in items}
-        email, user_id = headers_dict['remember_token'].split('|')
-        self.assertEqual(email, USER_DATA['email'])
+        token = headers_dict['remember_token']
+        with app.app_context():
+            user = load_user_from_id(user_id=USER_DATA['email'])
+            self.assertEqual(token, user.get_auth_token())
 
 
 class LogoutTests(DatabaseTestCase):
@@ -158,26 +167,26 @@ class LogoutTests(DatabaseTestCase):
 
 class LoadUserTests(DatabaseTestCase):
     """
-    Tests for ``load_user``, which is a function required by Flask-Login.
+    Tests for ``load_user_from_id``, which is a function required by Flask-Login.
     """
 
     def test_user_exists(self):
         """
-        If a user exists with the email given as the user ID to ``load_user``,
+        If a user exists with the email given as the user ID to ``load_user_from_id``,
         that user is returned.
         """
         self.app.post('/signup', data=USER_DATA)
         with app.app_context():
-            self.assertEqual(load_user(user_id=USER_DATA['email']),
+            self.assertEqual(load_user_from_id(user_id=USER_DATA['email']),
                              User(email=USER_DATA['email']))
 
     def test_user_does_not_exist(self):
         """
-        If no user exists with the email given as the user ID to ``load_user``,
+        If no user exists with the email given as the user ID to ``load_user_from_id``,
         ``None`` is returned.
         """
         with app.app_context():
-            self.assertIsNone(load_user(user_id='email'))
+            self.assertIsNone(load_user_from_id(user_id='email'))
 
 
 class UserTests(DatabaseTestCase):

@@ -7,6 +7,7 @@ from flask.ext.login import (
     login_required,
     login_user,
     logout_user,
+    make_secure_token,
     UserMixin,
 )
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -22,6 +23,9 @@ class User(db.Model, UserMixin):
     """
     email = db.Column(db.String, primary_key=True)
     password_hash = db.Column(db.String)
+
+    def get_auth_token(self):
+        return make_secure_token(email=self.email, password_hash=self.password_hash)
 
     def get_id(self):
         """
@@ -60,7 +64,7 @@ login_manager.init_app(app)
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user_from_id(user_id):
     """
     Flask-Login user_loader callback.
 
@@ -77,6 +81,14 @@ def load_user(user_id):
     return User.query.filter_by(email=user_id).first()
 
 
+@login_manager.token_loader
+def load_user_from_token(auth_token):
+    """
+    TODO
+    """
+    return User.query.filter_by(email='email').first()
+
+
 @app.route('/login', methods=['POST'])
 def login():
     """
@@ -88,11 +100,9 @@ def login():
     email = request.form['email']
     password = request.form['password']
 
-    existing_users = User.query.filter_by(email=email)
-    if not existing_users.count():
+    user = load_user_from_id(user_id=email)
+    if user is None:
         return jsonify({}), codes.NOT_FOUND
-
-    user = existing_users.first()
 
     if not bcrypt.check_password_hash(user.password_hash, password):
         return jsonify({}), codes.UNAUTHORIZED
@@ -124,7 +134,7 @@ def signup():
     email = request.form['email']
     password = request.form['password']
 
-    if load_user(email) is not None:
+    if load_user_from_id(email) is not None:
         return jsonify({}), codes.CONFLICT
 
     password_hash = bcrypt.generate_password_hash(password)
