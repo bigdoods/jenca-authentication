@@ -73,13 +73,20 @@ class SignupTests(DatabaseTestCase):
     def test_existing_user(self):
         """
         A signup request for an email address which already exists returns a
-        CONFLICT status code.
+        CONFLICT status code and error details.
         """
         self.app.post('/signup', data=USER_DATA)
         data = USER_DATA.copy()
         data['password'] = 'different'
         response = self.app.post('/signup', data=data)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.CONFLICT)
+        expected = {
+            'title': 'There is already a user with the given email address.',
+            'detail': 'A user already exists with the email "{email}"'.format(
+                email=USER_DATA['email']),
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
 
 class LoginTests(DatabaseTestCase):

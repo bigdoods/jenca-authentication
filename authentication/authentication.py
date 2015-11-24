@@ -186,7 +186,11 @@ def signup():
     password = request.form['password']
 
     if load_user_from_id(email) is not None:
-        return jsonify({}), codes.CONFLICT
+        return jsonify(
+            title='There is already a user with the given email address.',
+            detail='A user already exists with the email "{email}"'.format(
+                email=email),
+        ), codes.CONFLICT
 
     password_hash = bcrypt.generate_password_hash(password)
     user = User(email=email, password_hash=password_hash)
