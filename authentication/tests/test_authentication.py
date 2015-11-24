@@ -213,6 +213,13 @@ class LoadUserFromTokenTests(DatabaseTestCase):
             user = load_user_from_id(user_id=USER_DATA['email'])
             self.assertEqual(load_user_from_token(auth_token=token), user)
 
+    def test_fake_token(self):
+        pass
+
+    def test_modified_password(self):
+        pass
+
+# TODO direct token creation tests
 
 class UserTests(DatabaseTestCase):
     """
