@@ -122,6 +122,7 @@ def login():
     :param password: A password associated with the given ``email`` address.
     :type password: string
     :resheader Content-Type: application/json
+    :resheader Set-Cookie: A ``remember_token``.
     :resjson string email: The email address which has been logged in.
     :resjson string password: The password of the user which has been logged
         in.
