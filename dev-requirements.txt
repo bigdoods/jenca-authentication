@@ -1,6 +1,5 @@
 coverage # Allows us to measure code coverage
 doc8 # Style check documentation
 flake8 # Code analysis tool with linting
-linkchecker # Check links in the README
 Sphinx # Build documentation
 sphinxcontrib-httpdomain # Describe RESTful HTTP APIs in Sphinx
