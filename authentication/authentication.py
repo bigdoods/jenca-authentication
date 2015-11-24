@@ -135,15 +135,22 @@ def login():
 
     user = load_user_from_id(user_id=email)
     if user is None:
-        return jsonify({}), codes.NOT_FOUND
+        return jsonify({
+            'title': 'The requested user does not exist.',
+            'detail': 'No user exists with the email "{email}"'.format(
+                email=email),
+        }), codes.NOT_FOUND
 
     if not bcrypt.check_password_hash(user.password_hash, password):
-        return jsonify({}), codes.UNAUTHORIZED
+        return jsonify({
+            'title': 'An incorrect password was provided.',
+            'detail': 'The password for the user "{email}" does not match the '
+                      'password provided.'.format(email=email),
+        }), codes.UNAUTHORIZED
 
     login_user(user, remember=True)
 
-    response_content = {'email': email, 'password': password}
-    return jsonify(response_content), codes.OK
+    return jsonify(email=email, password=password)
 
 
 @app.route('/logout', methods=['POST'])
@@ -186,8 +193,7 @@ def signup():
     db.session.add(user)
     db.session.commit()
 
-    response_content = {'email': email, 'password': password}
-    return jsonify(response_content), codes.CREATED
+    return jsonify(email=email, password=password), codes.CREATED
 
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on

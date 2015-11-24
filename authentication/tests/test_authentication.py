@@ -99,21 +99,35 @@ class LoginTests(DatabaseTestCase):
     def test_login_non_existant(self):
         """
         Attempting to log in as a user which has been not been signed up
-        returns a NOT_FOUND status code.
+        returns a NOT_FOUND status code and error details..
         """
         response = self.app.post('/login', data=USER_DATA)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.NOT_FOUND)
+        expected = {
+            'title': 'The requested user does not exist.',
+            'detail': 'No user exists with the email "{email}"'.format(
+                email=USER_DATA['email']),
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
     def test_login_wrong_password(self):
         """
         Attempting to log in with an incorrect password returns an UNAUTHORIZED
-        status code.
+        status code and error details.
         """
         self.app.post('/signup', data=USER_DATA)
         data = USER_DATA.copy()
         data['password'] = 'incorrect'
         response = self.app.post('/login', data=data)
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
+        expected = {
+            'title': 'An incorrect password was provided.',
+            'detail': 'The password for the user "{email}" does not match the '
+                      'password provided.'.format(email=USER_DATA['email']),
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
     def test_remember_me_cookie_set(self):
         """
