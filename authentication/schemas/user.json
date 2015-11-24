@@ -1,0 +1,11 @@
+{
+  "create": {
+    "type": "object",
+    "properties": {
+      "email": {},
+      "password": {}
+    },
+    "required": ["email", "password", "foo"]
+  },
+  "update": {}
+}
