@@ -76,17 +76,19 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user_from_id(user_id):
     """
-    Flask-Login user_loader callback.
+    Flask-Login ``user_loader`` callback.
 
-    The user_loader function asks this function to get a User object based on
-    the user_id. If there is no user with the current userid (where user_id is
-    the result of ``User.get_id``), return None.
-
-    The user_id was stored in the session environment by Flask-Login.
-    user_loader stores the returned User object in current_user during every
-    flask request.
+    The ``user_id`` was stored in the session environment by Flask-Login.
+    user_loader stores the returned ``User`` object in ``current_user`` during
+    every flask request.
 
     See https://flask-login.readthedocs.org/en/latest/#flask.ext.login.LoginManager.user_loader.  # noqa
+
+    :param user_id: The ID of the user Flask is trying to load.
+    :type user_id: string
+    :return: The user which has the email address ``user_id`` or ``None`` if
+        there is no such user.
+    :rtype: ``User`` or ``None``.
     """
     return User.query.filter_by(email=user_id).first()
 
@@ -94,7 +96,16 @@ def load_user_from_id(user_id):
 @login_manager.token_loader
 def load_user_from_token(auth_token):
     """
-    TODO
+    Flask-Login token-loader callback.
+
+    See https://flask-login.readthedocs.org/en/latest/#flask.ext.login.LoginManager.token_loader  # noqa
+
+    :param auth_token: The authentication token of the user Flask is trying to
+        load.
+    :type user_id: string
+    :return: The user which has the given authentication token or ``None`` if
+        there is no such user.
+    :rtype: ``User`` or ``None``.
     """
     for user in User.query.all():
         if user.get_auth_token() == auth_token:
