@@ -10,6 +10,7 @@ from authentication.authentication import (
     bcrypt,
     db,
     load_user_from_id,
+    load_user_from_token,
     User,
 )
 
@@ -188,6 +189,21 @@ class LoadUserTests(DatabaseTestCase):
         with app.app_context():
             self.assertIsNone(load_user_from_id(user_id='email'))
 
+
+class LoadFromTokenTests(DatabaseTestCase):
+
+    def test_load(self):
+        self.app.post('/signup', data=USER_DATA)
+        response = self.app.post('/login', data=USER_DATA)
+        cookies = response.headers.getlist('Set-Cookie')
+
+        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
+        headers_dict = {key: value for key, value in items}
+        token = headers_dict['remember_token']
+        with app.app_context():
+            user = load_user_from_id(user_id=USER_DATA['email'])
+            self.assertEqual(token, user.get_auth_token())
+            self.assertEqual(load_user_from_token(auth_token=token), user)
 
 class UserTests(DatabaseTestCase):
     """

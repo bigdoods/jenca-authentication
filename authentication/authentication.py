@@ -86,7 +86,9 @@ def load_user_from_token(auth_token):
     """
     TODO
     """
-    return User.query.filter_by(email='email').first()
+    for user in User.query.all():
+        if user.get_auth_token() == auth_token:
+            return user
 
 
 @app.route('/login', methods=['POST'])
