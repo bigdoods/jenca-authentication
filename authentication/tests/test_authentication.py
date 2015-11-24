@@ -145,13 +145,19 @@ class LoginTests(DatabaseTestCase):
         Attempting to log in with an incorrect password returns an UNAUTHORIZED
         status code and error details.
         """
+        # TODO look at Flask-Negotiate
+        # TODO look on PyPI for a library with the content types
+        # Maybe flask-mime
         self.app.post(
             '/signup',
             content_type='application/json',
             data=json.dumps(USER_DATA))
         data = USER_DATA.copy()
         data['password'] = 'incorrect'
-        response = self.app.post('/login', data=data)
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=data)
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
         expected = {
@@ -170,7 +176,10 @@ class LoginTests(DatabaseTestCase):
             '/signup',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        response = self.app.post('/login', data=USER_DATA)
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         cookies = response.headers.getlist('Set-Cookie')
 
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]

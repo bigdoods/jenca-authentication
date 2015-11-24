@@ -119,7 +119,19 @@ def load_user_from_token(auth_token):
             return user
 
 
+@app.errorhandler(ValidationError)
+def on_validation_error(error):
+    """
+    TODO Document this
+    TODO Direct tests for this
+    TODO README changes to send application/json
+    TODO test sending json from browser?
+    """
+    return jsonify({}), codes.BAD_REQUEST
+
+
 @app.route('/login', methods=['POST'])
+@jsonschema.validate('user', 'get')
 def login():
     """
     Log in a given user.
@@ -137,8 +149,8 @@ def login():
     :status 404: No user can be found with the given ``email``.
     :status 401: The given ``password`` is incorrect.
     """
-    email = request.form['email']
-    password = request.form['password']
+    email = request.json['email']
+    password = request.json['password']
 
     user = load_user_from_id(user_id=email)
     if user is None:
@@ -160,16 +172,6 @@ def login():
     return jsonify(email=email, password=password)
 
 
-@app.errorhandler(ValidationError)
-def on_validation_error(e):
-    """
-    TODO Direct tests for this
-    TODO README changes to send application/json
-    TODO test sending json from browser?
-    """
-    return jsonify({}), codes.BAD_REQUEST
-
-
 @app.route('/logout', methods=['POST'])
 @login_required
 def logout():
@@ -187,6 +189,9 @@ def logout():
 @jsonschema.validate('user', 'create')
 def signup():
     """
+    TODO Document the application/json stuff
+    TODO (Tests for) stricter requirements in schema, e.g. email requirement
+
     Sign up a new user.
 
     :param email: The email address of the new user.
