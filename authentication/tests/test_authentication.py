@@ -1,6 +1,7 @@
 import json
 import unittest
 
+from flask.ext.login import make_secure_token
 from flask.ext.sqlalchemy import orm
 from requests import codes
 from werkzeug.http import parse_cookie
@@ -237,8 +238,6 @@ class LoadUserFromTokenTests(DatabaseTestCase):
             user.password_hash = 'new_hash'
             self.assertIsNone(load_user_from_token(auth_token=token))
 
-# TODO direct token creation tests
-
 
 class UserTests(DatabaseTestCase):
     """
@@ -265,3 +264,25 @@ class UserTests(DatabaseTestCase):
             db.session.add(user_2)
             with self.assertRaises(orm.exc.FlushError):
                 db.session.commit()
+
+    def test_get_auth_token(self):
+        """
+        Authentication tokens are created using Flask-Login's
+        ``make_secure_token`` function and the email address and password of
+        the user.
+        """
+        user = User(email='email', password_hash='password_hash')
+        with app.app_context():
+            self.assertEqual(user.get_auth_token(),
+                             make_secure_token('email', 'password_hash'))
+
+    def test_different_password_different_token(self):
+        """
+        If a user has a different password hash, it will have a different
+        token.
+        """
+        user_1 = User(email='email', password_hash='password_hash')
+        user_2 = User(email='email', password_hash='different_hash')
+        with app.app_context():
+            self.assertNotEqual(user_1.get_auth_token(),
+                                user_2.get_auth_token())
