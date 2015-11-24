@@ -122,10 +122,11 @@ def load_user_from_token(auth_token):
 @app.errorhandler(ValidationError)
 def on_validation_error(error):
     """
-    TODO Document this
     TODO Direct tests for this
     TODO README changes to send application/json
     TODO test sending json from browser?
+
+    :status 400:
     """
     return jsonify({}), codes.BAD_REQUEST
 
