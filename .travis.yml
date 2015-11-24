@@ -5,9 +5,11 @@ python:
   # Python 3)
   - "2.7"
   - "3.5"
-before_install:
-  # A spellchecking system used by Sphinx's spellchecking.
-  - apt-get install enchant
+addons:
+  apt:
+    packages:
+      # A spellchecking system used by Sphinx's spellchecking.
+      - enchant
 install:
   - "pip install -e .[dev]"
 before_script:
