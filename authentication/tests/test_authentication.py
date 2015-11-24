@@ -206,8 +206,14 @@ class LogoutTests(DatabaseTestCase):
         A POST request to log out when a user is logged in returns an OK status
         code.
         """
-        self.app.post('/signup', data=USER_DATA)
-        self.app.post('/login', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         response = self.app.post('/logout')
         self.assertEqual(response.status_code, codes.OK)
 
