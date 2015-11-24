@@ -12,6 +12,8 @@ before_script:
   - "flake8 ."
   # Style check the documentation:
   - "doc8 docs/"
+  # Check links in the README:
+  - "linkcheck README.md"
 script:
   # Build documentation HTML.
   - sphinx-build -W -v docs/source/ html
