@@ -164,6 +164,8 @@ def login():
 def on_validation_error(e):
     """
     TODO Direct tests for this
+    TODO README changes to send application/json
+    TODO test sending json from browser?
     """
     return jsonify({}), codes.BAD_REQUEST
 
