@@ -15,6 +15,7 @@ from flask.ext.login import (
     UserMixin,
 )
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask_jsonschema import JsonSchema, ValidationError
 
 from requests import codes
 
@@ -75,6 +76,8 @@ app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'schemas')
+jsonschema = JsonSchema(app)
 
 
 @login_manager.user_loader
@@ -157,6 +160,14 @@ def login():
     return jsonify(email=email, password=password)
 
 
+@app.errorhandler(ValidationError)
+def on_validation_error(e):
+    """
+    TODO Direct tests for this
+    """
+    return jsonify({}), codes.BAD_REQUEST
+
+
 @app.route('/logout', methods=['POST'])
 @login_required
 def logout():
@@ -171,6 +182,7 @@ def logout():
 
 
 @app.route('/signup', methods=['POST'])
+@jsonschema.validate('user', 'create')
 def signup():
     """
     Sign up a new user.
@@ -186,8 +198,8 @@ def signup():
         created.
     :status 409: There already exists a user with the given ``email``.
     """
-    email = request.form['email']
-    password = request.form['password']
+    email = request.json['email']
+    password = request.json['password']
 
     if load_user_from_id(email) is not None:
         return jsonify(

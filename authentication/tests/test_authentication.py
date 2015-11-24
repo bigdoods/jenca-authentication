@@ -51,7 +51,10 @@ class SignupTests(DatabaseTestCase):
         A signup ``POST`` request with an email address and password returns a
         JSON response with user credentials and a CREATED status.
         """
-        response = self.app.post('/signup', data=USER_DATA)
+        response = self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.CREATED)
         self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
@@ -60,7 +63,10 @@ class SignupTests(DatabaseTestCase):
         """
         Passwords are hashed before being saved to the database.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         with app.app_context():
             user = User.query.filter_by(email=USER_DATA['email']).first()
         self.assertTrue(bcrypt.check_password_hash(user.password_hash,
@@ -71,7 +77,10 @@ class SignupTests(DatabaseTestCase):
         A signup request without an email address or password returns a
         BAD_REQUEST status code.
         """
-        response = self.app.post('/signup', data={})
+        response = self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps({}))
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
 
     def test_existing_user(self):
@@ -79,10 +88,16 @@ class SignupTests(DatabaseTestCase):
         A signup request for an email address which already exists returns a
         CONFLICT status code and error details.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         data = USER_DATA.copy()
         data['password'] = 'different'
-        response = self.app.post('/signup', data=data)
+        response = self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.CONFLICT)
         expected = {
