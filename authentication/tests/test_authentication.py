@@ -168,13 +168,14 @@ class LogoutTests(DatabaseTestCase):
 
 class LoadUserTests(DatabaseTestCase):
     """
-    Tests for ``load_user_from_id``, which is a function required by Flask-Login.
+    Tests for ``load_user_from_id``, which is a function required by
+    Flask-Login.
     """
 
     def test_user_exists(self):
         """
-        If a user exists with the email given as the user ID to ``load_user_from_id``,
-        that user is returned.
+        If a user exists with the email given as the user ID to
+        ``load_user_from_id``, that user is returned.
         """
         self.app.post('/signup', data=USER_DATA)
         with app.app_context():
@@ -183,8 +184,8 @@ class LoadUserTests(DatabaseTestCase):
 
     def test_user_does_not_exist(self):
         """
-        If no user exists with the email given as the user ID to ``load_user_from_id``,
-        ``None`` is returned.
+        If no user exists with the email given as the user ID to
+        ``load_user_from_id``, ``None`` is returned.
         """
         with app.app_context():
             self.assertIsNone(load_user_from_id(user_id='email'))
@@ -204,6 +205,7 @@ class LoadFromTokenTests(DatabaseTestCase):
             user = load_user_from_id(user_id=USER_DATA['email'])
             self.assertEqual(token, user.get_auth_token())
             self.assertEqual(load_user_from_token(auth_token=token), user)
+
 
 class UserTests(DatabaseTestCase):
     """

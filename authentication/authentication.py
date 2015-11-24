@@ -25,7 +25,11 @@ class User(db.Model, UserMixin):
     password_hash = db.Column(db.String)
 
     def get_auth_token(self):
-        return make_secure_token(email=self.email, password_hash=self.password_hash)
+        """
+        TODO
+        """
+        return make_secure_token(email=self.email,
+                                 password_hash=self.password_hash)
 
     def get_id(self):
         """
