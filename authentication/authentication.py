@@ -122,13 +122,16 @@ def load_user_from_token(auth_token):
 @app.errorhandler(ValidationError)
 def on_validation_error(error):
     """
-    TODO Direct tests for this
     TODO README changes to send application/json
-    TODO test sending json from browser?
 
+    :resjson string title: An explanation that there was a validation error.
+    :resjson string message: The precise validation error.
     :status 400:
     """
-    return jsonify({}), codes.BAD_REQUEST
+    return jsonify(
+        title='There was an error validating the given arguments.',
+        detail=error.message,
+    ), codes.BAD_REQUEST
 
 
 @app.route('/login', methods=['POST'])
