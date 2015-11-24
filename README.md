@@ -68,7 +68,6 @@ $ open docs/build/html/index.html
 ## TODO
 
 * Better persistence of the database with Docker volumes (maybe a different service or container for persistence).
-* Better auth tokens, see https://flask-login.readthedocs.org/en/latest/#remember-me.
 * Perhaps login should happen after signup, this should be factored out.
 * API responses should have good messages, data, not just status codes
 * Automated, good API docs (instead of this terrible README solution) probably sphinxcontrib.autohttp.flask
