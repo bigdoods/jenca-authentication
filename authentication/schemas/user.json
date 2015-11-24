@@ -5,7 +5,7 @@
       "email": {},
       "password": {}
     },
-    "required": ["email", "password", "foo"]
+    "required": ["email", "password"]
   },
   "update": {}
 }
