@@ -4,11 +4,7 @@
 
 An authentication service for Jenca Cloud.
 
-## API
-
-* `/login` takes `email` and `password`.
-* `/signup` takes `email` and `password`.
-* `/logout`.
+The full documentation for this service can be seen at http://jenca-authentication.readthedocs.org/.
 
 
 ## Running this service
@@ -49,9 +45,7 @@ To start developing quickly, it is recommended that you create a `virtualenv` an
 Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authentication).
 
 
-## Documentation
-
-The full documentation for this service can be seen at http://jenca-authentication.readthedocs.org/.
+### Documentation
 
 To build the documentation locally, install the development requirements and then use the Makefile in the `docs/` directory:
 
@@ -71,7 +65,6 @@ $ open docs/build/html/index.html
 * Better auth tokens, see https://flask-login.readthedocs.org/en/latest/#remember-me.
 * Perhaps login should happen after signup, this should be factored out.
 * API responses should have good messages, data, not just status codes
-* Automated, good API docs (instead of this terrible README solution) probably sphinxcontrib.autohttp.flask
 * Validate schema of JSON, e.g. with https://github.com/mattupstate/flask-jsonschema or http://pythonhosted.org/Flask-Inputs/
 * Some kind of versioning system
 * Flesh out setup.py

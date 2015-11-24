@@ -1,17 +1,8 @@
-Welcome to Jenca Authentication's documentation!
-================================================
+Jenca Authentication
+====================
 
-Contents:
+API Endpoints
+-------------
 
-.. toctree::
-   :maxdepth: 2
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+.. autoflask:: authentication.authentication:app
+   :undoc-static:
