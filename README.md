@@ -69,5 +69,3 @@ $ open docs/build/html/index.html
 * Some kind of versioning system
 * Direct tests for `load_user` and `get_id`
 * Flesh out setup.py
-* Spellcheck Python docstrings
-

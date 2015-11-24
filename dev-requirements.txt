@@ -1,3 +1,4 @@
+beautifulsoup4>=4.4.1 # This version is necessary as older versions used ``HTMLParseError`` which has been removed in Python 3.5. Used for Sphinx checkers.
 coverage # Allows us to measure code coverage
 doc8 # Style check documentation
 flake8 # Code analysis tool with linting
