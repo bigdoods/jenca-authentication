@@ -67,7 +67,4 @@ $ open docs/build/html/index.html
 * API responses should have good messages, data, not just status codes
 * Validate schema of JSON, e.g. with https://github.com/mattupstate/flask-jsonschema or http://pythonhosted.org/Flask-Inputs/
 * Some kind of versioning system
-* Direct tests for `load_user` and `get_id`
 * Flesh out setup.py
-* Fancy Sphinx options (linkcheck, spellcheck)
-
