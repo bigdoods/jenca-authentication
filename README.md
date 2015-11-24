@@ -59,7 +59,7 @@ To build the documentation locally, install the development requirements and the
 (my_virtualenv)$ make -C docs/ html
 ```
 
-To view this build documentation, run:
+To view this built documentation, run:
 
 ```
 $ open docs/build/html/index.html
