@@ -7,6 +7,7 @@ from flask.ext.login import (
     login_required,
     login_user,
     logout_user,
+    make_secure_token,
     UserMixin,
 )
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -23,10 +24,23 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String, primary_key=True)
     password_hash = db.Column(db.String)
 
+    def get_auth_token(self):
+        """
+        See https://flask-login.readthedocs.org/en/latest/#alternative-tokens
+
+        :return: A secure token unique to this ``User`` with the current
+            ``password_hash``.
+        :rtype: string
+        """
+        return make_secure_token(self.email, self.password_hash)
+
     def get_id(self):
         """
-        Return the email address to satify Flask-Login's requirements. This is
-        used in conjunction with ``load_user`` for session management
+        See https://flask-login.readthedocs.org/en/latest/#your-user-class
+
+        :return: the email address to satify Flask-Login's requirements. This
+            is used in conjunction with ``load_user`` for session management.
+        :rtype: string
         """
         return self.email
 
@@ -42,7 +56,7 @@ def create_app(database_uri):
     """
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-    app.config['SECRET_KEY'] = 'secret'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET', 'secret')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     db.init_app(app)
 
@@ -60,21 +74,42 @@ login_manager.init_app(app)
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user_from_id(user_id):
     """
-    Flask-Login user_loader callback.
+    Flask-Login ``user_loader`` callback.
 
-    The user_loader function asks this function to get a User object based on
-    the user_id. If there is no user with the current userid (where user_id is
-    the result of ``User.get_id``), return None.
-
-    The user_id was stored in the session environment by Flask-Login.
-    user_loader stores the returned User object in current_user during every
-    flask request.
+    The ``user_id`` was stored in the session environment by Flask-Login.
+    user_loader stores the returned ``User`` object in ``current_user`` during
+    every flask request.
 
     See https://flask-login.readthedocs.org/en/latest/#flask.ext.login.LoginManager.user_loader.  # noqa
+
+    :param user_id: The ID of the user Flask is trying to load.
+    :type user_id: string
+    :return: The user which has the email address ``user_id`` or ``None`` if
+        there is no such user.
+    :rtype: ``User`` or ``None``.
     """
     return User.query.filter_by(email=user_id).first()
+
+
+@login_manager.token_loader
+def load_user_from_token(auth_token):
+    """
+    Flask-Login token-loader callback.
+
+    See https://flask-login.readthedocs.org/en/latest/#flask.ext.login.LoginManager.token_loader  # noqa
+
+    :param auth_token: The authentication token of the user Flask is trying to
+        load.
+    :type user_id: string
+    :return: The user which has the given authentication token or ``None`` if
+        there is no such user.
+    :rtype: ``User`` or ``None``.
+    """
+    for user in User.query.all():
+        if user.get_auth_token() == auth_token:
+            return user
 
 
 @app.route('/login', methods=['POST'])
@@ -97,11 +132,9 @@ def login():
     email = request.form['email']
     password = request.form['password']
 
-    existing_users = User.query.filter_by(email=email)
-    if not existing_users.count():
+    user = load_user_from_id(user_id=email)
+    if user is None:
         return jsonify({}), codes.NOT_FOUND
-
-    user = existing_users.first()
 
     if not bcrypt.check_password_hash(user.password_hash, password):
         return jsonify({}), codes.UNAUTHORIZED
@@ -144,7 +177,7 @@ def signup():
     email = request.form['email']
     password = request.form['password']
 
-    if load_user(email) is not None:
+    if load_user_from_id(email) is not None:
         return jsonify({}), codes.CONFLICT
 
     password_hash = bcrypt.generate_password_hash(password)

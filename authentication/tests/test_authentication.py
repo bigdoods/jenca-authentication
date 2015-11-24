@@ -1,11 +1,19 @@
 import json
 import unittest
 
+from flask.ext.login import make_secure_token
 from flask.ext.sqlalchemy import orm
 from requests import codes
 from werkzeug.http import parse_cookie
 
-from authentication.authentication import app, db, User, bcrypt, load_user
+from authentication.authentication import (
+    app,
+    bcrypt,
+    db,
+    load_user_from_id,
+    load_user_from_token,
+    User,
+)
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
@@ -109,7 +117,8 @@ class LoginTests(DatabaseTestCase):
 
     def test_remember_me_cookie_set(self):
         """
-        A "Remember Me" token is in the response header of a successful login.
+        A "Remember Me" token is in the response header of a successful login
+        with the value of ``User.get_auth_token`` for the logged in user.
         """
         self.app.post('/signup', data=USER_DATA)
         response = self.app.post('/login', data=USER_DATA)
@@ -117,8 +126,10 @@ class LoginTests(DatabaseTestCase):
 
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
         headers_dict = {key: value for key, value in items}
-        email, user_id = headers_dict['remember_token'].split('|')
-        self.assertEqual(email, USER_DATA['email'])
+        token = headers_dict['remember_token']
+        with app.app_context():
+            user = load_user_from_id(user_id=USER_DATA['email'])
+            self.assertEqual(token, user.get_auth_token())
 
 
 class LogoutTests(DatabaseTestCase):
@@ -158,26 +169,74 @@ class LogoutTests(DatabaseTestCase):
 
 class LoadUserTests(DatabaseTestCase):
     """
-    Tests for ``load_user``, which is a function required by Flask-Login.
+    Tests for ``load_user_from_id``, which is a function required by
+    Flask-Login.
     """
 
     def test_user_exists(self):
         """
-        If a user exists with the email given as the user ID to ``load_user``,
-        that user is returned.
+        If a user exists with the email given as the user ID to
+        ``load_user_from_id``, that user is returned.
         """
         self.app.post('/signup', data=USER_DATA)
         with app.app_context():
-            self.assertEqual(load_user(user_id=USER_DATA['email']),
+            self.assertEqual(load_user_from_id(user_id=USER_DATA['email']),
                              User(email=USER_DATA['email']))
 
     def test_user_does_not_exist(self):
         """
-        If no user exists with the email given as the user ID to ``load_user``,
-        ``None`` is returned.
+        If no user exists with the email given as the user ID to
+        ``load_user_from_id``, ``None`` is returned.
         """
         with app.app_context():
-            self.assertIsNone(load_user(user_id='email'))
+            self.assertIsNone(load_user_from_id(user_id='email'))
+
+
+class LoadUserFromTokenTests(DatabaseTestCase):
+    """
+    Tests for ``load_user_from_token``, which is a function required by
+    Flask-Login when using secure "Alternative Tokens".
+    """
+
+    def test_load_user_from_token(self):
+        """
+        A user is loaded if their token is provided to
+        ``load_user_from_token``.
+        """
+        self.app.post('/signup', data=USER_DATA)
+        response = self.app.post('/login', data=USER_DATA)
+        cookies = response.headers.getlist('Set-Cookie')
+
+        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
+        headers_dict = {key: value for key, value in items}
+        token = headers_dict['remember_token']
+        with app.app_context():
+            user = load_user_from_id(user_id=USER_DATA['email'])
+            self.assertEqual(load_user_from_token(auth_token=token), user)
+
+    def test_fake_token(self):
+        """
+        If a token does not belong to a user, ``None`` is returned.
+        """
+        with app.app_context():
+            self.assertIsNone(load_user_from_token(auth_token='fake_token'))
+
+    def test_modified_password(self):
+        """
+        If a user's password (hash) is modified, their token is no longer
+        valid.
+        """
+        self.app.post('/signup', data=USER_DATA)
+        response = self.app.post('/login', data=USER_DATA)
+        cookies = response.headers.getlist('Set-Cookie')
+
+        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
+        headers_dict = {key: value for key, value in items}
+        token = headers_dict['remember_token']
+        with app.app_context():
+            user = load_user_from_id(user_id=USER_DATA['email'])
+            user.password_hash = 'new_hash'
+            self.assertIsNone(load_user_from_token(auth_token=token))
 
 
 class UserTests(DatabaseTestCase):
@@ -205,3 +264,25 @@ class UserTests(DatabaseTestCase):
             db.session.add(user_2)
             with self.assertRaises(orm.exc.FlushError):
                 db.session.commit()
+
+    def test_get_auth_token(self):
+        """
+        Authentication tokens are created using Flask-Login's
+        ``make_secure_token`` function and the email address and password of
+        the user.
+        """
+        user = User(email='email', password_hash='password_hash')
+        with app.app_context():
+            self.assertEqual(user.get_auth_token(),
+                             make_secure_token('email', 'password_hash'))
+
+    def test_different_password_different_token(self):
+        """
+        If a user has a different password hash, it will have a different
+        token.
+        """
+        user_1 = User(email='email', password_hash='password_hash')
+        user_2 = User(email='email', password_hash='different_hash')
+        with app.app_context():
+            self.assertNotEqual(user_1.get_auth_token(),
+                                user_2.get_auth_token())

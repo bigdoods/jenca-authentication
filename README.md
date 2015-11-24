@@ -53,7 +53,7 @@ To build the documentation locally, install the development requirements and the
 (my_virtualenv)$ make -C docs/ html
 ```
 
-To view this build documentation, run:
+To view this built documentation, run:
 
 ```
 $ open docs/build/html/index.html
@@ -62,7 +62,6 @@ $ open docs/build/html/index.html
 ## TODO
 
 * Better persistence of the database with Docker volumes (maybe a different service or container for persistence).
-* Better auth tokens, see https://flask-login.readthedocs.org/en/latest/#remember-me.
 * Perhaps login should happen after signup, this should be factored out.
 * API responses should have good messages, data, not just status codes
 * Validate schema of JSON, e.g. with https://github.com/mattupstate/flask-jsonschema or http://pythonhosted.org/Flask-Inputs/
