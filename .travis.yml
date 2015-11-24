@@ -5,6 +5,11 @@ python:
   # Python 3)
   - "2.7"
   - "3.5"
+addons:
+  apt:
+    packages:
+      # A spellchecking system used by Sphinx's spellchecking.
+      - enchant
 install:
   # Install a link checker on Python 2 but not Python 3 as it will not install
   # on Python 3.
@@ -20,7 +25,13 @@ before_script:
   - "if [[ $TRAVIS_PYTHON_VERSION < 3 ]]; then linkchecker README.md; fi"
 script:
   # Build documentation HTML.
-  - sphinx-build -W -v docs/source/ html
+  - sphinx-build -W -b html -d build/doctrees docs/source build/html
+  # Check that links in the documentation work.
+  # Only do this on Python versions < 3.5 to work around
+  # https://github.com/sphinx-doc/sphinx/issues/1945
+  - if [[ $TRAVIS_PYTHON_VERSION < 3.5 ]]; then sphinx-build -W -b linkcheck -d build/doctrees docs/source build/linkcheck; fi
+  # Check spelling in the documentation.
+  - sphinx-build -W -b spelling -d build/doctrees docs/source build/spelling
   # Run all discoverable tests, but set the source directory so that the coverage tool knows not to include coverage for all dependencies.
   - "coverage run --source=authentication -m unittest discover"
 after_success:
