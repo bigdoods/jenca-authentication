@@ -1,3 +1,7 @@
+"""
+An authentication service for use in a Jenca Cloud.
+"""
+
 import os
 
 from flask import Flask, jsonify, request
@@ -122,6 +126,7 @@ def login():
     :param password: A password associated with the given ``email`` address.
     :type password: string
     :resheader Content-Type: application/json
+    :resheader Set-Cookie: A ``remember_token``.
     :resjson string email: The email address which has been logged in.
     :resjson string password: The password of the user which has been logged
         in.
@@ -134,15 +139,22 @@ def login():
 
     user = load_user_from_id(user_id=email)
     if user is None:
-        return jsonify({}), codes.NOT_FOUND
+        return jsonify(
+            title='The requested user does not exist.',
+            detail='No user exists with the email "{email}"'.format(
+                email=email),
+        ), codes.NOT_FOUND
 
     if not bcrypt.check_password_hash(user.password_hash, password):
-        return jsonify({}), codes.UNAUTHORIZED
+        return jsonify(
+            title='An incorrect password was provided.',
+            detail='The password for the user "{email}" does not match the '
+                   'password provided.'.format(email=email),
+        ), codes.UNAUTHORIZED
 
     login_user(user, remember=True)
 
-    response_content = {'email': email, 'password': password}
-    return jsonify(response_content), codes.OK
+    return jsonify(email=email, password=password)
 
 
 @app.route('/logout', methods=['POST'])
@@ -178,15 +190,18 @@ def signup():
     password = request.form['password']
 
     if load_user_from_id(email) is not None:
-        return jsonify({}), codes.CONFLICT
+        return jsonify(
+            title='There is already a user with the given email address.',
+            detail='A user already exists with the email "{email}"'.format(
+                email=email),
+        ), codes.CONFLICT
 
     password_hash = bcrypt.generate_password_hash(password)
     user = User(email=email, password_hash=password_hash)
     db.session.add(user)
     db.session.commit()
 
-    response_content = {'email': email, 'password': password}
-    return jsonify(response_content), codes.CREATED
+    return jsonify(email=email, password=password), codes.CREATED
 
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on
