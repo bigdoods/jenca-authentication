@@ -15,6 +15,8 @@ before_script:
 script:
   # Build documentation HTML.
   - sphinx-build -W -v docs/source/ html
+  # Check that links in the docs work.
+  - make -C docs/ linkcheck
   # Run all discoverable tests, but set the source directory so that the coverage tool knows not to include coverage for all dependencies.
   - "coverage run --source=authentication -m unittest discover"
 after_success:
