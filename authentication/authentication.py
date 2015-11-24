@@ -135,18 +135,18 @@ def login():
 
     user = load_user_from_id(user_id=email)
     if user is None:
-        return jsonify({
-            'title': 'The requested user does not exist.',
-            'detail': 'No user exists with the email "{email}"'.format(
+        return jsonify(
+            title='The requested user does not exist.',
+            detail='No user exists with the email "{email}"'.format(
                 email=email),
-        }), codes.NOT_FOUND
+        ), codes.NOT_FOUND
 
     if not bcrypt.check_password_hash(user.password_hash, password):
-        return jsonify({
-            'title': 'An incorrect password was provided.',
-            'detail': 'The password for the user "{email}" does not match the '
-                      'password provided.'.format(email=email),
-        }), codes.UNAUTHORIZED
+        return jsonify(
+            title='An incorrect password was provided.',
+            detail='The password for the user "{email}" does not match the '
+                   'password provided.'.format(email=email),
+        ), codes.UNAUTHORIZED
 
     login_user(user, remember=True)
 
