@@ -13,7 +13,7 @@ before_script:
   # Style check the documentation:
   - "doc8 docs/"
   # Check links in the README:
-  - "linkcheck README.md"
+  - "linkchecker README.md"
 script:
   # Build documentation HTML.
   - sphinx-build -W -v docs/source/ html
