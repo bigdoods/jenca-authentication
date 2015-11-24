@@ -28,8 +28,7 @@ class User(db.Model, UserMixin):
         """
         TODO
         """
-        return make_secure_token(email=self.email,
-                                 password_hash=self.password_hash)
+        return make_secure_token(self.email, self.password_hash)
 
     def get_id(self):
         """

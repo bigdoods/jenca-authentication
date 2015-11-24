@@ -214,12 +214,31 @@ class LoadUserFromTokenTests(DatabaseTestCase):
             self.assertEqual(load_user_from_token(auth_token=token), user)
 
     def test_fake_token(self):
-        pass
+        """
+        If a token does not belong to a user, ``None`` is returned.
+        """
+        with app.app_context():
+            self.assertIsNone(load_user_from_token(auth_token='fake_token'))
 
     def test_modified_password(self):
-        pass
+        """
+        If a user's password (hash) is modified, their token is no longer
+        valid.
+        """
+        self.app.post('/signup', data=USER_DATA)
+        response = self.app.post('/login', data=USER_DATA)
+        cookies = response.headers.getlist('Set-Cookie')
+
+        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
+        headers_dict = {key: value for key, value in items}
+        token = headers_dict['remember_token']
+        with app.app_context():
+            user = load_user_from_id(user_id=USER_DATA['email'])
+            user.password_hash = 'new_hash'
+            self.assertIsNone(load_user_from_token(auth_token=token))
 
 # TODO direct token creation tests
+
 
 class UserTests(DatabaseTestCase):
     """
