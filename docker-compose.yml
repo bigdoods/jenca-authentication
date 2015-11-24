@@ -10,4 +10,5 @@ web:
    - /tmp/authentication:/data
   environment:
    - SQLALCHEMY_DATABASE_URI=sqlite:////data/authentication.db
+   - SECRET
   command: python authentication/authentication.py
