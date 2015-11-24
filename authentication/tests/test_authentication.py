@@ -191,9 +191,17 @@ class LoadUserTests(DatabaseTestCase):
             self.assertIsNone(load_user_from_id(user_id='email'))
 
 
-class LoadFromTokenTests(DatabaseTestCase):
+class LoadUserFromTokenTests(DatabaseTestCase):
+    """
+    Tests for ``load_user_from_token``, which is a function required by
+    Flask-Login when using secure "Alternative Tokens".
+    """
 
-    def test_load(self):
+    def test_load_user_from_token(self):
+        """
+        A user is loaded if their token is provided to
+        ``load_user_from_token``.
+        """
         self.app.post('/signup', data=USER_DATA)
         response = self.app.post('/login', data=USER_DATA)
         cookies = response.headers.getlist('Set-Cookie')
@@ -203,7 +211,6 @@ class LoadFromTokenTests(DatabaseTestCase):
         token = headers_dict['remember_token']
         with app.app_context():
             user = load_user_from_id(user_id=USER_DATA['email'])
-            self.assertEqual(token, user.get_auth_token())
             self.assertEqual(load_user_from_token(auth_token=token), user)
 
 
