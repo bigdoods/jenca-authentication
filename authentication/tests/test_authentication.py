@@ -151,9 +151,6 @@ class LoginTests(DatabaseTestCase):
         Attempting to log in with an incorrect password returns an UNAUTHORIZED
         status code and error details.
         """
-        # TODO look at Flask-Negotiate
-        # TODO look on PyPI for a library with the content types
-        # Maybe flask-mime
         self.app.post(
             '/signup',
             content_type='application/json',
