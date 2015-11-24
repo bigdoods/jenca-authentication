@@ -10,13 +10,25 @@ with open("requirements.txt") as requirements:
 with open("dev-requirements.txt") as dev_requirements:
     dev_requires = dev_requirements.readlines()
 
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
     name="Jenca_Authentication",
     version="0.1",
+    author="Jenca",
+    url="http://www.jenca.io",
     description="Authenticate users for Jenca Cloud.",
+    long_description=long_description,
+    license='GNU Affero General Public License v3',
     packages=find_packages(),
     install_requires=install_requires,
     extras_require={
         "dev": dev_requires,
     },
+    classifiers=[
+        'Operating System :: POSIX',
+        'Environment :: Web Environment',
+        'License :: OSI Approved :: GNU Affero General Public License v3',
+    ],
 )
