@@ -230,8 +230,14 @@ class LogoutTests(DatabaseTestCase):
         A POST request to log out, after a successful log out attempt returns
         an UNAUTHORIZED status code.
         """
-        self.app.post('/signup', data=USER_DATA)
-        self.app.post('/login', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         self.app.post('/logout')
         response = self.app.post('/logout')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
@@ -248,7 +254,10 @@ class LoadUserTests(DatabaseTestCase):
         If a user exists with the email given as the user ID to
         ``load_user_from_id``, that user is returned.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         with app.app_context():
             self.assertEqual(load_user_from_id(user_id=USER_DATA['email']),
                              User(email=USER_DATA['email']))
@@ -273,8 +282,14 @@ class LoadUserFromTokenTests(DatabaseTestCase):
         A user is loaded if their token is provided to
         ``load_user_from_token``.
         """
-        self.app.post('/signup', data=USER_DATA)
-        response = self.app.post('/login', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         cookies = response.headers.getlist('Set-Cookie')
 
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
@@ -296,8 +311,15 @@ class LoadUserFromTokenTests(DatabaseTestCase):
         If a user's password (hash) is modified, their token is no longer
         valid.
         """
-        self.app.post('/signup', data=USER_DATA)
-        response = self.app.post('/login', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+
         cookies = response.headers.getlist('Set-Cookie')
 
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
