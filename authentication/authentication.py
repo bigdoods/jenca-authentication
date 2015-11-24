@@ -26,14 +26,21 @@ class User(db.Model, UserMixin):
 
     def get_auth_token(self):
         """
-        TODO
+        See https://flask-login.readthedocs.org/en/latest/#alternative-tokens
+
+        :return: A secure token unique to this ``User`` with the current
+            ``password_hash``.
+        :rtype: string
         """
         return make_secure_token(self.email, self.password_hash)
 
     def get_id(self):
         """
-        Return the email address to satify Flask-Login's requirements. This is
-        used in conjunction with ``load_user`` for session management
+        See https://flask-login.readthedocs.org/en/latest/#your-user-class
+
+        :return: the email address to satify Flask-Login's requirements. This
+            is used in conjunction with ``load_user`` for session management.
+        :rtype: string
         """
         return self.email
 
