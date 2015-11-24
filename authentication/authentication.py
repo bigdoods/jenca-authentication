@@ -56,7 +56,7 @@ def create_app(database_uri):
     """
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-    app.config['SECRET_KEY'] = 'secret'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET', 'secret')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     db.init_app(app)
 
