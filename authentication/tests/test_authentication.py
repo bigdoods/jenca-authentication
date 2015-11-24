@@ -1,3 +1,7 @@
+"""
+Tests for authentication.authentication.
+"""
+
 import json
 import unittest
 

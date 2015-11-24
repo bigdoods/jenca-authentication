@@ -1,3 +1,7 @@
+"""
+An authentication service for use in a Jenca Cloud.
+"""
+
 import os
 
 from flask import Flask, jsonify, request
