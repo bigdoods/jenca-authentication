@@ -118,7 +118,10 @@ class LoginTests(DatabaseTestCase):
         Logging in as a user which has been signed up returns an OK status
         code.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         response = self.app.post('/login', data=USER_DATA)
         self.assertEqual(response.status_code, codes.OK)
 
@@ -142,7 +145,10 @@ class LoginTests(DatabaseTestCase):
         Attempting to log in with an incorrect password returns an UNAUTHORIZED
         status code and error details.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         data = USER_DATA.copy()
         data['password'] = 'incorrect'
         response = self.app.post('/login', data=data)
@@ -160,7 +166,10 @@ class LoginTests(DatabaseTestCase):
         A "Remember Me" token is in the response header of a successful login
         with the value of ``User.get_auth_token`` for the logged in user.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         response = self.app.post('/login', data=USER_DATA)
         cookies = response.headers.getlist('Set-Cookie')
 
