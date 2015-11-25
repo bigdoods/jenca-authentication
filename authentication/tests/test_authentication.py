@@ -72,16 +72,22 @@ class SignupTests(DatabaseTestCase):
         self.assertTrue(bcrypt.check_password_hash(user.password_hash,
                                                    USER_DATA['password']))
 
-    def test_missing_data(self):
+    def test_missing_email(self):
         """
-        A signup request without an email address or password returns a
-        BAD_REQUEST status code.
+        A signup request without an email address BAD_REQUEST status code and
+        an error message.
         """
         response = self.app.post(
             '/signup',
             content_type='application/json',
             data=json.dumps({}))
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
+        expected = {
+            'title': 'There was an error validating the given arguments.',
+            'detail': "u'email' is a required property",
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
     def test_existing_user(self):
         """
