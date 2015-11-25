@@ -268,7 +268,7 @@ class LogoutTests(DatabaseTestCase):
             '/login',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        response = self.app.post('/logout')
+        response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.OK)
 
     def test_not_logged_in(self):
@@ -276,7 +276,7 @@ class LogoutTests(DatabaseTestCase):
         A POST request to log out when no user is logged in returns an
         UNAUTHORIZED status code.
         """
-        response = self.app.post('/logout')
+        response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
 
     def test_logout_twice(self):
@@ -292,9 +292,12 @@ class LogoutTests(DatabaseTestCase):
             '/login',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        self.app.post('/logout')
-        response = self.app.post('/logout')
+        self.app.post('/logout', content_type='application/json')
+        response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
+
+    def test_incorrect_mime_type(self):
+        pass
 
 
 class LoadUserTests(DatabaseTestCase):

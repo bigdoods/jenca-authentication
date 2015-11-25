@@ -16,6 +16,7 @@ from flask.ext.login import (
 )
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_jsonschema import JsonSchema, ValidationError
+from flask_negotiate import consumes
 
 from requests import codes
 
@@ -122,8 +123,6 @@ def load_user_from_token(auth_token):
 @app.errorhandler(ValidationError)
 def on_validation_error(error):
     """
-    TODO direct tests for this
-
     :resjson string title: An explanation that there was a validation error.
     :resjson string message: The precise validation error.
     :status 400:
@@ -178,6 +177,7 @@ def login():
 
 
 @app.route('/logout', methods=['POST'])
+@consumes('application/json')
 @login_required
 def logout():
     """
@@ -197,8 +197,6 @@ def logout():
 @jsonschema.validate('user', 'create')
 def signup():
     """
-    TODO (Tests for) stricter requirements in schema, e.g. email requirement
-
     Sign up a new user.
 
     :param email: The email address of the new user.
