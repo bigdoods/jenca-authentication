@@ -181,6 +181,9 @@ def login():
 @login_required
 def logout():
     """
+    # TODO Make this take JSON content-header
+    # Flask-Validate
+
     Log the current user out.
 
     :resheader Content-Type: application/json
