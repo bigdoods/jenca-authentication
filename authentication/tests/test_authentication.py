@@ -85,7 +85,7 @@ class SignupTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
         expected = {
             'title': 'There was an error validating the given arguments.',
-            'detail': "u'email' is a required property",
+            'detail': "'email' is a required property",
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
@@ -102,7 +102,7 @@ class SignupTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
         expected = {
             'title': 'There was an error validating the given arguments.',
-            'detail': "u'password' is a required property",
+            'detail': "'password' is a required property",
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
@@ -236,7 +236,7 @@ class LoginTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
         expected = {
             'title': 'There was an error validating the given arguments.',
-            'detail': "u'email' is a required property",
+            'detail': "'email' is a required property",
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
@@ -253,7 +253,7 @@ class LoginTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
         expected = {
             'title': 'There was an error validating the given arguments.',
-            'detail': "u'password' is a required property",
+            'detail': "'password' is a required property",
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
