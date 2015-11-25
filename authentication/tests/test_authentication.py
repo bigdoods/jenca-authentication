@@ -138,6 +138,7 @@ class SignupTests(DatabaseTestCase):
         response = self.app.post('/signup', content_type='text/html')
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
+
 class LoginTests(DatabaseTestCase):
     """
     Tests for the user log in endpoint at ``/login``.
