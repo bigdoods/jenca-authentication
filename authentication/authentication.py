@@ -144,6 +144,7 @@ def login():
     :type email: string
     :param password: A password associated with the given ``email`` address.
     :type password: string
+    :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resheader Set-Cookie: A ``remember_token``.
     :resjson string email: The email address which has been logged in.
@@ -193,7 +194,6 @@ def logout():
 @jsonschema.validate('user', 'create')
 def signup():
     """
-    TODO Document the application/json stuff
     TODO (Tests for) stricter requirements in schema, e.g. email requirement
 
     Sign up a new user.
@@ -202,6 +202,7 @@ def signup():
     :type email: string
     :param password: A password to associate with the given ``email`` address.
     :type password: string
+    :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
     :resjson string password: The password of the new user.
