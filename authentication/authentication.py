@@ -129,7 +129,10 @@ def on_validation_error(error):
     """
     return jsonify(
         title='There was an error validating the given arguments.',
-        detail=error.message,
+        # By default on Python 2 errors will look like:
+        # "u'password' is a required property".
+        # This removes all "u'"s, and so could be dangerous.
+        detail=error.message.replace("u'", "'"),
     ), codes.BAD_REQUEST
 
 
