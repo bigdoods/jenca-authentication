@@ -74,8 +74,8 @@ class SignupTests(DatabaseTestCase):
 
     def test_missing_email(self):
         """
-        A signup request without an email address returns a BAD_REQUEST status code
-        and an error message.
+        A signup request without an email address returns a BAD_REQUEST status
+        code and an error message.
         """
         response = self.app.post(
             '/signup',
@@ -151,7 +151,7 @@ class LoginTests(DatabaseTestCase):
             data=json.dumps(USER_DATA))
         self.assertEqual(response.status_code, codes.OK)
 
-    def test_login_non_existant(self):
+    def test_non_existant_user(self):
         """
         Attempting to log in as a user which has been not been signed up
         returns a NOT_FOUND status code and error details..
@@ -169,7 +169,7 @@ class LoginTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
-    def test_login_wrong_password(self):
+    def test_wrong_password(self):
         """
         Attempting to log in with an incorrect password returns an UNAUTHORIZED
         status code and error details.
@@ -214,6 +214,40 @@ class LoginTests(DatabaseTestCase):
         with app.app_context():
             user = load_user_from_id(user_id=USER_DATA['email'])
             self.assertEqual(token, user.get_auth_token())
+
+    def test_missing_email(self):
+        """
+        A login request without an email address returns a BAD_REQUEST status
+        code and an error message.
+        """
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps({'password': USER_DATA['password']}))
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.BAD_REQUEST)
+        expected = {
+            'title': 'There was an error validating the given arguments.',
+            'detail': "u'email' is a required property",
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_missing_password(self):
+        """
+        A login request without a password returns a BAD_REQUEST status code
+        and an error message.
+        """
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps({'email': USER_DATA['email']}))
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.BAD_REQUEST)
+        expected = {
+            'title': 'There was an error validating the given arguments.',
+            'detail': "u'password' is a required property",
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
 
 class LogoutTests(DatabaseTestCase):
