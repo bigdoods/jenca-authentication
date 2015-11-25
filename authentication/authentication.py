@@ -123,6 +123,7 @@ def load_user_from_token(auth_token):
 def on_validation_error(error):
     """
     TODO README changes to send application/json
+    TODO direct tests for this
 
     :resjson string title: An explanation that there was a validation error.
     :resjson string message: The precise validation error.
