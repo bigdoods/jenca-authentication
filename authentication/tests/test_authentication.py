@@ -74,18 +74,35 @@ class SignupTests(DatabaseTestCase):
 
     def test_missing_email(self):
         """
-        A signup request without an email address BAD_REQUEST status code and
-        an error message.
+        A signup request without an email address returns a BAD_REQUEST status code
+        and an error message.
         """
         response = self.app.post(
             '/signup',
             content_type='application/json',
-            data=json.dumps({}))
+            data=json.dumps({'password': USER_DATA['password']}))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
         expected = {
             'title': 'There was an error validating the given arguments.',
             'detail': "u'email' is a required property",
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_missing_password(self):
+        """
+        A signup request without a password returns a BAD_REQUEST status code
+        and an error message.
+        """
+        response = self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps({'email': USER_DATA['email']}))
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.BAD_REQUEST)
+        expected = {
+            'title': 'There was an error validating the given arguments.',
+            'detail': "u'password' is a required property",
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
