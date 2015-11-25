@@ -134,6 +134,7 @@ def on_validation_error(error):
 
 
 @app.route('/login', methods=['POST'])
+@consumes('application/json')
 @jsonschema.validate('user', 'get')
 def login():
     """
@@ -181,9 +182,6 @@ def login():
 @login_required
 def logout():
     """
-    # TODO Make this take JSON content-header
-    # Flask-Validate
-
     Log the current user out.
 
     :resheader Content-Type: application/json
@@ -194,6 +192,7 @@ def logout():
 
 
 @app.route('/signup', methods=['POST'])
+@consumes('application/json')
 @jsonschema.validate('user', 'create')
 def signup():
     """

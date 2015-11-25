@@ -130,6 +130,13 @@ class SignupTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.post('/signup', content_type='text/html')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 class LoginTests(DatabaseTestCase):
     """
@@ -248,6 +255,14 @@ class LoginTests(DatabaseTestCase):
             'detail': "u'password' is a required property",
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.post('/login', content_type='text/html')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
 class LogoutTests(DatabaseTestCase):
