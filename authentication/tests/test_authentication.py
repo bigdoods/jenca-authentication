@@ -296,8 +296,13 @@ class LogoutTests(DatabaseTestCase):
         response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
 
-    def test_incorrect_mime_type(self):
-        pass
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.post('/logout')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
 class LoadUserTests(DatabaseTestCase):
