@@ -122,7 +122,6 @@ def load_user_from_token(auth_token):
 @app.errorhandler(ValidationError)
 def on_validation_error(error):
     """
-    TODO README changes to send application/json
     TODO direct tests for this
 
     :resjson string title: An explanation that there was a validation error.
