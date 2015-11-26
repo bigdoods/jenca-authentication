@@ -16,7 +16,7 @@ import unittest
 
 from requests import codes
 
-from authentication.authentication import app, db
+from storage.storage import app, db
 
 USER_DATA = {'email': 'alice@example.com', 'password_hash': '123abc'}
 
