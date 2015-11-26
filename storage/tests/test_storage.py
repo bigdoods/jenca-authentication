@@ -166,40 +166,6 @@ class GetUserTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
-    def test_missing_email(self):
-        """
-        A login request without an email address returns a BAD_REQUEST status
-        code and an error message.
-        """
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps({'password': USER_DATA['password']}))
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        self.assertEqual(response.status_code, codes.BAD_REQUEST)
-        expected = {
-            'title': 'There was an error validating the given arguments.',
-            'detail': "'email' is a required property",
-        }
-        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
-
-    def test_missing_password(self):
-        """
-        A login request without a password returns a BAD_REQUEST status code
-        and an error message.
-        """
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps({'email': USER_DATA['email']}))
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        self.assertEqual(response.status_code, codes.BAD_REQUEST)
-        expected = {
-            'title': 'There was an error validating the given arguments.',
-            'detail': "'password' is a required property",
-        }
-        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
-
     def test_incorrect_content_type(self):
         """
         If a Content-Type header other than 'application/json' is given, an
