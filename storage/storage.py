@@ -1,5 +1,5 @@
 """
-An authentication service for use in a Jenca Cloud.
+An storage service for use by a Jenca Cloud authentication service.
 """
 
 import os
