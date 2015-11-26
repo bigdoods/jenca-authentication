@@ -218,7 +218,6 @@ def signup():
     :status 409: There already exists a user with the given ``email``.
     """
     import requests
-    requests.post('http://storage:5001/signup', data="{'email': 'foo@gmail.com', 'password': 'lop'}")
 
     email = request.json['email']
     password = request.json['password']
@@ -231,9 +230,11 @@ def signup():
         ), codes.CONFLICT
 
     password_hash = bcrypt.generate_password_hash(password)
-    user = User(email=email, password_hash=password_hash)
-    db.session.add(user)
-    db.session.commit()
+
+    requests.post('http://storage:5001/user/create', data=jsonify(
+        email=email,
+        password_hash=password_hash,
+    ))
 
     return jsonify(email=email, password=password), codes.CREATED
 
