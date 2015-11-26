@@ -353,14 +353,6 @@ class UserTests(DatabaseTestCase):
     Tests for the ``User`` model.
     """
 
-    def test_get_id(self):
-        """
-        ``User.get_id`` returns the email of a ``User``. This is required by
-        Flask-Login as a unique identifier.
-        """
-        user = User(email='email', password_hash='password_hash')
-        self.assertEqual(user.get_id(), 'email')
-
     def test_email_unique(self):
         """
         There cannot be two users with the same email address.
@@ -373,25 +365,3 @@ class UserTests(DatabaseTestCase):
             db.session.add(user_2)
             with self.assertRaises(orm.exc.FlushError):
                 db.session.commit()
-
-    def test_get_auth_token(self):
-        """
-        Authentication tokens are created using Flask-Login's
-        ``make_secure_token`` function and the email address and password of
-        the user.
-        """
-        user = User(email='email', password_hash='password_hash')
-        with app.app_context():
-            self.assertEqual(user.get_auth_token(),
-                             make_secure_token('email', 'password_hash'))
-
-    def test_different_password_different_token(self):
-        """
-        If a user has a different password hash, it will have a different
-        token.
-        """
-        user_1 = User(email='email', password_hash='password_hash')
-        user_2 = User(email='email', password_hash='different_hash')
-        with app.app_context():
-            self.assertNotEqual(user_1.get_auth_token(),
-                                user_2.get_auth_token())
