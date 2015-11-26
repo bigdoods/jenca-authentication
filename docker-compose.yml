@@ -8,6 +8,7 @@ authenticate:
    - "5000:5000"
   volumes:
    - /tmp/authentication:/data
+   - .:/code
   environment:
    - SQLALCHEMY_DATABASE_URI=sqlite:////data/authentication.db
    - SECRET
@@ -26,6 +27,7 @@ storage:
   container_name: authentication_storage
   volumes:
    - /tmp/authentication:/data
+   - .:/code
   environment:
    - SQLALCHEMY_DATABASE_URI=sqlite:////data/authentication.db
   command: python storage/storage.py
