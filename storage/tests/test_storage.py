@@ -13,7 +13,6 @@ Tests for storage service.
 import json
 import unittest
 
-from flask.ext.login import make_secure_token
 from flask.ext.sqlalchemy import orm
 from requests import codes
 from werkzeug.http import parse_cookie
@@ -22,7 +21,6 @@ from authentication.authentication import (
     app,
     db,
     load_user_from_id,
-    load_user_from_token,
     User,
 )
 
@@ -286,66 +284,6 @@ class LoadUserTests(DatabaseTestCase):
         """
         with app.app_context():
             self.assertIsNone(load_user_from_id(user_id='email'))
-
-
-class LoadUserFromTokenTests(DatabaseTestCase):
-    """
-    Tests for ``load_user_from_token``, which is a function required by
-    Flask-Login when using secure "Alternative Tokens".
-    """
-
-    def test_load_user_from_token(self):
-        """
-        A user is loaded if their token is provided to
-        ``load_user_from_token``.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        cookies = response.headers.getlist('Set-Cookie')
-
-        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
-        headers_dict = {key: value for key, value in items}
-        token = headers_dict['remember_token']
-        with app.app_context():
-            user = load_user_from_id(user_id=USER_DATA['email'])
-            self.assertEqual(load_user_from_token(auth_token=token), user)
-
-    def test_fake_token(self):
-        """
-        If a token does not belong to a user, ``None`` is returned.
-        """
-        with app.app_context():
-            self.assertIsNone(load_user_from_token(auth_token='fake_token'))
-
-    def test_modified_password(self):
-        """
-        If a user's password (hash) is modified, their token is no longer
-        valid.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-
-        cookies = response.headers.getlist('Set-Cookie')
-
-        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
-        headers_dict = {key: value for key, value in items}
-        token = headers_dict['remember_token']
-        with app.app_context():
-            user = load_user_from_id(user_id=USER_DATA['email'])
-            user.password_hash = 'new_hash'
-            self.assertIsNone(load_user_from_token(auth_token=token))
 
 
 class UserTests(DatabaseTestCase):
