@@ -81,7 +81,6 @@ def on_validation_error(error):
 
 
 @app.route('/users/<email>', methods=['GET'])
-@consumes('application/json')
 def get_user(email):
     """
     Get information about particular user.
@@ -108,7 +107,6 @@ def get_user(email):
 
 
 @app.route('/users', methods=['POST'])
-@consumes('application/json')
 @jsonschema.validate('users', 'create')
 def create_user():
     """
