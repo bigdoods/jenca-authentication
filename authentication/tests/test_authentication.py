@@ -45,7 +45,10 @@ class SignupTests(unittest.TestCase):
             with storage_app.app_context():
                 storage_db.create_all()
             client = storage_app.test_client()
-            response = client.post(request.path_url, content_type=request.headers['Content-Type'], data=request.body)
+            response = client.post(
+                request.path_url,
+                content_type=request.headers['Content-Type'],
+                data=request.body)
             # import pdb; pdb.set_trace()
             return (
                 response.status_code,
