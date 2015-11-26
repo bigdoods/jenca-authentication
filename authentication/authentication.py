@@ -104,7 +104,7 @@ def load_user_from_token(auth_token):
     """
     response = requests.get('http://storage:5001/users/')
 
-    for details in json.loads(response):
+    for details in json.loads(response.data):
         user = User(
             email=details['email'],
             password_hash=details['password_hash'],
