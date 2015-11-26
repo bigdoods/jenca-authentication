@@ -49,8 +49,7 @@ class SignupTests(unittest.TestCase):
             '/signup',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        with app.app_context():
-            user = User.query.filter_by(email=USER_DATA['email']).first()
+        user = load_user_from_id(user_id=USER_DATA['email'])
         self.assertTrue(bcrypt.check_password_hash(user.password_hash,
                                                    USER_DATA['password']))
 
