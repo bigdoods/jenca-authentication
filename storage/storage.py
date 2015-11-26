@@ -83,6 +83,29 @@ def on_validation_error(error):
     ), codes.BAD_REQUEST
 
 
+@app.route('/users/<email>', methods=['GET'])
+@consumes('application/json')
+def get_user(email):
+    """
+    Create a new user.
+
+    :param email: The email address of the new user.
+    :type email: string
+    :param password_hash: A password hash to associate with the given ``email``
+        address.
+    :type password: string
+    :reqheader Content-Type: application/json
+    :resheader Content-Type: application/json
+    :resjson string email: The email address of the new user.
+    :resjson string password_hash: The password of the new user.
+    :status 200: A user with the given ``email`` and ``password`` has been
+        created.
+    :status 409: There already exists a user with the given ``email``.
+    """
+    user = load_user_from_id(email)
+    return jsonify(email=user.email, password_hash=user.password_hash), codes.OK
+
+
 @app.route('/users', methods=['POST'])
 @consumes('application/json')
 @jsonschema.validate('users', 'create')
