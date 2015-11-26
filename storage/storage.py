@@ -8,9 +8,6 @@ from flask import Flask, jsonify, request
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import (
     LoginManager,
-    login_required,
-    login_user,
-    logout_user,
     make_secure_token,
     UserMixin,
 )
@@ -140,65 +137,7 @@ def on_validation_error(error):
     ), codes.BAD_REQUEST
 
 
-@app.route('/login', methods=['POST'])
-@consumes('application/json')
-@jsonschema.validate('user', 'get')
-def login():
-    """
-    Log in a given user.
-
-    :param email: An email address to log in as.
-    :type email: string
-    :param password: A password associated with the given ``email`` address.
-    :type password: string
-    :reqheader Content-Type: application/json
-    :resheader Content-Type: application/json
-    :resheader Set-Cookie: A ``remember_token``.
-    :resjson string email: The email address which has been logged in.
-    :resjson string password: The password of the user which has been logged
-        in.
-    :status 200: A user with the given ``email`` has been logged in.
-    :status 404: No user can be found with the given ``email``.
-    :status 401: The given ``password`` is incorrect.
-    """
-    email = request.json['email']
-    password = request.json['password']
-
-    user = load_user_from_id(user_id=email)
-    if user is None:
-        return jsonify(
-            title='The requested user does not exist.',
-            detail='No user exists with the email "{email}"'.format(
-                email=email),
-        ), codes.NOT_FOUND
-
-    if not bcrypt.check_password_hash(user.password_hash, password):
-        return jsonify(
-            title='An incorrect password was provided.',
-            detail='The password for the user "{email}" does not match the '
-                   'password provided.'.format(email=email),
-        ), codes.UNAUTHORIZED
-
-    login_user(user, remember=True)
-
-    return jsonify(email=email, password=password)
-
-
-@app.route('/logout', methods=['POST'])
-@consumes('application/json')
-@login_required
-def logout():
-    """
-    Log the current user out.
-
-    :resheader Content-Type: application/json
-    :status 200: The current user has been logged out.
-    """
-    logout_user()
-    return jsonify({}), codes.OK
-
-
-@app.route('/signup', methods=['POST'])
+@app.route('/user/create', methods=['POST'])
 @consumes('application/json')
 @jsonschema.validate('user', 'create')
 def signup():
@@ -207,12 +146,13 @@ def signup():
 
     :param email: The email address of the new user.
     :type email: string
-    :param password: A password to associate with the given ``email`` address.
+    :param password_hash: A password hash to associate with the given ``email``
+        address.
     :type password: string
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
-    :resjson string password: The password of the new user.
+    :resjson string password_hash: The password of the new user.
     :status 200: A user with the given ``email`` and ``password`` has been
         created.
     :status 409: There already exists a user with the given ``email``.
