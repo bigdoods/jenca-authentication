@@ -21,6 +21,7 @@ storage:
 
    # Flask defaults to listening on port 5000 but this is configurable.
    # See http://flask.pocoo.org/docs/0.10/api/#flask.Flask.run
+   # TODO Use an environment variable for the port to run on, so ``authenticate`` can see it
    - "5001:5001"
   container_name: authentication_storage
   volumes:
