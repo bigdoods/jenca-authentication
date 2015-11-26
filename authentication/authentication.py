@@ -61,7 +61,8 @@ login_manager.init_app(app)
 # Inputs can be validated using JSON schema.
 # Schemas are in app.config['JSONSCHEMA_DIR'].
 # See https://github.com/mattupstate/flask-jsonschema for details.
-app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'schemas')
+app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'authentication',
+                                            'schemas')
 jsonschema = JsonSchema(app)
 
 
