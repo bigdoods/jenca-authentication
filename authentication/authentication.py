@@ -218,10 +218,14 @@ def signup():
 
     password_hash = bcrypt.generate_password_hash(password)
 
-    requests.post('http://storage:5001/users', data=jsonify(
-        email=email,
-        password_hash=password_hash,
-    ))
+    requests.post(
+        'http://storage:5001/users',
+        headers={'Content-Type': 'application/json'},
+        data=json.dumps({
+            'email': email,
+            'password_hash': str(password_hash),
+        }),
+    )
 
     return jsonify(email=email, password=password), codes.CREATED
 
