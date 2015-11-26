@@ -5,7 +5,6 @@ An storage service for use by a Jenca Cloud authentication service.
 import os
 
 from flask import Flask, jsonify, request
-from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import LoginManager
 
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -48,7 +47,6 @@ def create_app(database_uri):
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
                                          'sqlite:///:memory:')
 app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
-bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
