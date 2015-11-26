@@ -158,7 +158,7 @@ def signup():
     :status 409: There already exists a user with the given ``email``.
     """
     email = request.json['email']
-    password = request.json['password']
+    password = request.json['password_hash']
 
     if load_user_from_id(email) is not None:
         return jsonify(
@@ -167,12 +167,11 @@ def signup():
                 email=email),
         ), codes.CONFLICT
 
-    password_hash = bcrypt.generate_password_hash(password)
     user = User(email=email, password_hash=password_hash)
     db.session.add(user)
     db.session.commit()
 
-    return jsonify(email=email, password=password), codes.CREATED
+    return jsonify(email=email, password=password_hash), codes.CREATED
 
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on
