@@ -49,7 +49,7 @@ class SignupTests(unittest.TestCase):
                 request.path_url,
                 content_type=request.headers['Content-Type'],
                 data=request.body)
-            # import pdb; pdb.set_trace()
+
             return (
                 response.status_code,
                 {key: value for (key, value) in response.headers},
