@@ -45,7 +45,14 @@ class CreateUserTests(DatabaseTestCase):
     Tests for the user creation endpoint at ``POST /users``.
     """
 
-    def test_create_user(self):
+    def test_persistence(self):
+        """
+        A signup ``POST`` request with an email address and password hash
+        stores user details in a persistent database.
+        """
+        # TODO
+
+    def test_success_response(self):
         """
         A signup ``POST`` request with an email address and password hash
         returns a JSON response with user details and a CREATED status.
@@ -136,9 +143,10 @@ class GetUserTests(DatabaseTestCase):
     Tests for getting a user at ``GET /users/{email}``.
     """
 
-    def test_get_user(self):
+    def test_success(self):
         """
-        TODO
+        A ``GET`` request for an existing user an OK status code and the user's
+        details.
         """
         self.app.post(
             '/users',
@@ -148,10 +156,11 @@ class GetUserTests(DatabaseTestCase):
             '/users/{email}'.format(email=USER_DATA['email']),
             content_type='application/json')
         self.assertEqual(response.status_code, codes.OK)
+        self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
 
     def test_non_existant_user(self):
         """
-        Attempting to log in as a user which does not exist returns a NOT_FOUND
+        A ``GET`` request for a user which does not exist returns a NOT_FOUND
         status code and error details.
         """
         response = self.app.get(
@@ -171,5 +180,7 @@ class GetUserTests(DatabaseTestCase):
         If a Content-Type header other than 'application/json' is given, an
         UNSUPPORTED_MEDIA_TYPE status code is given.
         """
-        response = self.app.post('/login', content_type='text/html')
+        response = self.app.get(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='text/html')
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
