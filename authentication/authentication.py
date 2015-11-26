@@ -82,10 +82,16 @@ def load_user_from_id(user_id):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    response = requests.get('http://storage:5001/users/{email}'.format(
-        email=user_id))
-    details = json.loads(response)
-    return User(email=details['email'], password_hash=details['password_hash'])
+    response = requests.get(
+        'http://storage:5001/users/{email}'.format(email=user_id),
+    )
+
+    if response.status_code == codes.OK:
+        details = json.loads(response.text)
+        return User(
+            email=details['email'],
+            password_hash=details['password_hash'],
+        )
 
 
 @login_manager.token_loader
