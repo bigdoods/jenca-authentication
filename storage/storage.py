@@ -83,9 +83,9 @@ def on_validation_error(error):
     ), codes.BAD_REQUEST
 
 
-@app.route('/user/create', methods=['POST'])
+@app.route('/users', methods=['POST'])
 @consumes('application/json')
-@jsonschema.validate('user', 'create')
+# @jsonschema.validate('user', 'create')
 def create_user():
     """
     Create a new user.
@@ -117,7 +117,7 @@ def create_user():
     db.session.add(user)
     db.session.commit()
 
-    return jsonify(email=email, password=password_hash), codes.CREATED
+    return jsonify(email=email, password_hash=password_hash), codes.CREATED
 
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on
