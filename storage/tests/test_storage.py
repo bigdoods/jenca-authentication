@@ -1,5 +1,5 @@
 """
-Tests for authentication.authentication.
+Tests for storage service.
 """
 
 # TODO Replace tests here with just tests for the new API
@@ -20,7 +20,6 @@ from werkzeug.http import parse_cookie
 
 from authentication.authentication import (
     app,
-    bcrypt,
     db,
     load_user_from_id,
     load_user_from_token,
@@ -51,7 +50,7 @@ class DatabaseTestCase(unittest.TestCase):
 
 class CreateUserTests(DatabaseTestCase):
     """
-    Tests for the user sign up endpoint at ``POST /users``.
+    Tests for the user creation endpoint at ``POST /users``.
     """
 
     def test_signup(self):
@@ -60,25 +59,12 @@ class CreateUserTests(DatabaseTestCase):
         JSON response with user credentials and a CREATED status.
         """
         response = self.app.post(
-            '/signup',
+            '/users',
             content_type='application/json',
             data=json.dumps(USER_DATA))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.CREATED)
         self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
-
-    def test_passwords_hashed(self):
-        """
-        Passwords are hashed before being saved to the database.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        with app.app_context():
-            user = User.query.filter_by(email=USER_DATA['email']).first()
-        self.assertTrue(bcrypt.check_password_hash(user.password_hash,
-                                                   USER_DATA['password']))
 
     def test_missing_email(self):
         """
@@ -147,9 +133,9 @@ class CreateUserTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LoginTests(DatabaseTestCase):
+class GetUserTests(DatabaseTestCase):
     """
-    Tests for the user log in endpoint at ``/login``.
+    Tests for getting a user at ``GET /users/{email}``.
     """
 
     def test_login(self):
@@ -271,61 +257,6 @@ class LoginTests(DatabaseTestCase):
         UNSUPPORTED_MEDIA_TYPE status code is given.
         """
         response = self.app.post('/login', content_type='text/html')
-        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
-
-
-class LogoutTests(DatabaseTestCase):
-    """
-    Tests for the user log out endpoint at ``/logout``.
-    """
-
-    def test_logout(self):
-        """
-        A POST request to log out when a user is logged in returns an OK status
-        code.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        response = self.app.post('/logout', content_type='application/json')
-        self.assertEqual(response.status_code, codes.OK)
-
-    def test_not_logged_in(self):
-        """
-        A POST request to log out when no user is logged in returns an
-        UNAUTHORIZED status code.
-        """
-        response = self.app.post('/logout', content_type='application/json')
-        self.assertEqual(response.status_code, codes.UNAUTHORIZED)
-
-    def test_logout_twice(self):
-        """
-        A POST request to log out, after a successful log out attempt returns
-        an UNAUTHORIZED status code.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        self.app.post('/logout', content_type='application/json')
-        response = self.app.post('/logout', content_type='application/json')
-        self.assertEqual(response.status_code, codes.UNAUTHORIZED)
-
-    def test_incorrect_content_type(self):
-        """
-        If a Content-Type header other than 'application/json' is given, an
-        UNSUPPORTED_MEDIA_TYPE status code is given.
-        """
-        response = self.app.post('/logout')
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
