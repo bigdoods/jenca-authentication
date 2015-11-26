@@ -56,17 +56,8 @@ app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'schemas')
 jsonschema = JsonSchema(app)
 
 
-@login_manager.user_loader
 def load_user_from_id(user_id):
     """
-    Flask-Login ``user_loader`` callback.
-
-    The ``user_id`` was stored in the session environment by Flask-Login.
-    user_loader stores the returned ``User`` object in ``current_user`` during
-    every flask request.
-
-    See https://flask-login.readthedocs.org/en/latest/#flask.ext.login.LoginManager.user_loader.  # noqa
-
     :param user_id: The ID of the user Flask is trying to load.
     :type user_id: string
     :return: The user which has the email address ``user_id`` or ``None`` if
@@ -74,25 +65,6 @@ def load_user_from_id(user_id):
     :rtype: ``User`` or ``None``.
     """
     return User.query.filter_by(email=user_id).first()
-
-
-@login_manager.token_loader
-def load_user_from_token(auth_token):
-    """
-    Flask-Login token-loader callback.
-
-    See https://flask-login.readthedocs.org/en/latest/#flask.ext.login.LoginManager.token_loader  # noqa
-
-    :param auth_token: The authentication token of the user Flask is trying to
-        load.
-    :type user_id: string
-    :return: The user which has the given authentication token or ``None`` if
-        there is no such user.
-    :rtype: ``User`` or ``None``.
-    """
-    for user in User.query.all():
-        if user.get_auth_token() == auth_token:
-            return user
 
 
 @app.errorhandler(ValidationError)
@@ -114,9 +86,9 @@ def on_validation_error(error):
 @app.route('/user/create', methods=['POST'])
 @consumes('application/json')
 @jsonschema.validate('user', 'create')
-def signup():
+def create_user():
     """
-    Sign up a new user.
+    Create a new user.
 
     :param email: The email address of the new user.
     :type email: string
