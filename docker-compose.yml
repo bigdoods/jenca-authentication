@@ -1,4 +1,4 @@
-web:
+authenticate:
   build: .
   ports:
    # HOST:CONTAINER
@@ -12,3 +12,12 @@ web:
    - SQLALCHEMY_DATABASE_URI=sqlite:////data/authentication.db
    - SECRET
   command: python authentication/authentication.py
+  links:
+    - storage
+storage:
+  build: .
+  volumes:
+   - /tmp/authentication:/data
+  environment:
+   - SQLALCHEMY_DATABASE_URI=sqlite:////data/authentication.db
+  command: python storage/storage.py
