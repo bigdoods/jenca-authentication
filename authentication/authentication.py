@@ -51,29 +51,8 @@ class User(db.Model, UserMixin):
         return self.email
 
 
-def create_app(database_uri):
-    """
-    Create an application with a database in a given location.
-
-    :param database_uri: The location of the database for the application.
-    :type database_uri: string
-    :return: An application instance.
-    :rtype: ``Flask``
-    """
-    app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-    app.config['SECRET_KEY'] = os.environ.get('SECRET', 'secret')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-    db.init_app(app)
-
-    with app.app_context():
-        db.create_all()
-
-    return app
-
-SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
-                                         'sqlite:///:memory:')
-app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET', 'secret')
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
