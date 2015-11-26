@@ -46,7 +46,7 @@ class SignupTests(unittest.TestCase):
                 storage_db.create_all()
             client = storage_app.test_client()
             NEW_USER_DATA = {'email': 'alice@example.com', 'password_hash': '123abc'}
-            response = client.post(request.path_url, content_type='application/json', data=json.dumps(NEW_USER_DATA))
+            response = client.post(request.path_url, content_type=request.headers['Content-Type'], data=json.dumps(NEW_USER_DATA))
             # import pdb; pdb.set_trace()
             return (
                 response.status_code,
