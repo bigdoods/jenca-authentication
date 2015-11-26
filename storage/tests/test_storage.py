@@ -15,12 +15,10 @@ import unittest
 
 from flask.ext.sqlalchemy import orm
 from requests import codes
-from werkzeug.http import parse_cookie
 
 from authentication.authentication import (
     app,
     db,
-    load_user_from_id,
     User,
 )
 
@@ -72,7 +70,7 @@ class CreateUserTests(DatabaseTestCase):
         response = self.app.post(
             '/signup',
             content_type='application/json',
-            data=json.dumps({'password': USER_DATA['password']}))
+            data=json.dumps({'password_hash': USER_DATA['password_hash']}))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
         expected = {
@@ -81,7 +79,7 @@ class CreateUserTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
-    def test_missing_password(self):
+    def test_missing_password_hash(self):
         """
         A signup request without a password returns a BAD_REQUEST status code
         and an error message.
@@ -136,10 +134,9 @@ class GetUserTests(DatabaseTestCase):
     Tests for getting a user at ``GET /users/{email}``.
     """
 
-    def test_login(self):
+    def test_get_user(self):
         """
-        Logging in as a user which has been signed up returns an OK status
-        code.
+        TODO
         """
         self.app.post(
             '/signup',
@@ -193,28 +190,6 @@ class GetUserTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
-    def test_remember_me_cookie_set(self):
-        """
-        A "Remember Me" token is in the response header of a successful login
-        with the value of ``User.get_auth_token`` for the logged in user.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        cookies = response.headers.getlist('Set-Cookie')
-
-        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
-        headers_dict = {key: value for key, value in items}
-        token = headers_dict['remember_token']
-        with app.app_context():
-            user = load_user_from_id(user_id=USER_DATA['email'])
-            self.assertEqual(token, user.get_auth_token())
-
     def test_missing_email(self):
         """
         A login request without an email address returns a BAD_REQUEST status
@@ -256,34 +231,6 @@ class GetUserTests(DatabaseTestCase):
         """
         response = self.app.post('/login', content_type='text/html')
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
-
-
-class LoadUserTests(DatabaseTestCase):
-    """
-    Tests for ``load_user_from_id``, which is a function required by
-    Flask-Login.
-    """
-
-    def test_user_exists(self):
-        """
-        If a user exists with the email given as the user ID to
-        ``load_user_from_id``, that user is returned.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        with app.app_context():
-            self.assertEqual(load_user_from_id(user_id=USER_DATA['email']),
-                             User(email=USER_DATA['email']))
-
-    def test_user_does_not_exist(self):
-        """
-        If no user exists with the email given as the user ID to
-        ``load_user_from_id``, ``None`` is returned.
-        """
-        with app.app_context():
-            self.assertIsNone(load_user_from_id(user_id='email'))
 
 
 class UserTests(DatabaseTestCase):
