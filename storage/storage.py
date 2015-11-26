@@ -107,6 +107,7 @@ def get_user(email):
 
 
 @app.route('/users', methods=['POST'])
+@consumes('application/json')
 @jsonschema.validate('users', 'create')
 def create_user():
     """
