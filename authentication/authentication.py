@@ -14,21 +14,21 @@ from flask.ext.login import (
     make_secure_token,
     UserMixin,
 )
-from flask.ext.sqlalchemy import SQLAlchemy
+
 from flask_jsonschema import JsonSchema, ValidationError
 from flask_negotiate import consumes
 
 from requests import codes
 
-db = SQLAlchemy()
 
+class User(UserMixin):
+    """
+    A user has an email address and a password hash.
+    """
 
-class User(db.Model, UserMixin):
-    """
-    A user has an email and password.
-    """
-    email = db.Column(db.String, primary_key=True)
-    password_hash = db.Column(db.String)
+    def __init__(self, email, password_hash):
+        self.email = email
+        self.password_hash = password_hash
 
     def get_auth_token(self):
         """
@@ -81,6 +81,7 @@ def load_user_from_id(user_id):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
+    return User()
     return User.query.filter_by(email=user_id).first()
 
 
