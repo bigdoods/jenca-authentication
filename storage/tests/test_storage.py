@@ -2,8 +2,8 @@
 Tests for storage service.
 """
 
-# TODO Replace tests here with just tests for the new API
 # TODO tests for getting all users
+# TODO update the docs
 # TODO Put the docs for this API in the docs
 # TODO move things around so that all of the source is in one place (maybe
 # with a `common` package)
@@ -45,16 +45,9 @@ class CreateUserTests(DatabaseTestCase):
     Tests for the user creation endpoint at ``POST /users``.
     """
 
-    def test_persistence(self):
-        """
-        A signup ``POST`` request with an email address and password hash
-        stores user details in a persistent database.
-        """
-        # TODO
-
     def test_success_response(self):
         """
-        A signup ``POST`` request with an email address and password hash
+        A ``POST /users`` request with an email address and password hash
         returns a JSON response with user details and a CREATED status.
         """
         response = self.app.post(
@@ -67,8 +60,8 @@ class CreateUserTests(DatabaseTestCase):
 
     def test_missing_email(self):
         """
-        A signup request without an email address returns a BAD_REQUEST status
-        code and an error message.
+        A ``POST /users`` request without an email address returns a
+        BAD_REQUEST status code and an error message.
         """
         data = USER_DATA.copy()
         data.pop('email')
@@ -87,8 +80,8 @@ class CreateUserTests(DatabaseTestCase):
 
     def test_missing_password_hash(self):
         """
-        A signup request without a password hash returns a BAD_REQUEST status
-        code and an error message.
+        A ``POST /users`` request without a password hash returns a BAD_REQUEST
+        status code and an error message.
         """
         data = USER_DATA.copy()
         data.pop('password_hash')
@@ -107,8 +100,8 @@ class CreateUserTests(DatabaseTestCase):
 
     def test_existing_user(self):
         """
-        A signup request for an email address which already exists returns a
-        CONFLICT status code and error details.
+        A ``POST /users`` request for an email address which already exists
+        returns a CONFLICT status code and error details.
         """
         self.app.post(
             '/users',
