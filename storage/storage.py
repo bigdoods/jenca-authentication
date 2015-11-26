@@ -102,8 +102,8 @@ def get_user(email):
                 email=email),
         ), codes.NOT_FOUND
 
-    return (jsonify(email=user.email, password_hash=user.password_hash),
-            codes.OK)
+    return_data = jsonify(email=user.email, password_hash=user.password_hash)
+    return return_data, codes.OK
 
 
 @app.route('/users', methods=['POST'])
