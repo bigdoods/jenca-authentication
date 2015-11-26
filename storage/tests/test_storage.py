@@ -3,6 +3,7 @@ Tests for storage service.
 """
 
 # TODO Replace tests here with just tests for the new API
+# TODO tests for getting all users
 # TODO Put the docs for this API in the docs
 # TODO move things around so that all of the source is in one place (maybe
 # with a `common` package)
