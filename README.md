@@ -64,3 +64,4 @@ $ open docs/build/html/index.html
 * Better persistence of the database with Docker volumes (maybe a different service or container for persistence).
 * /status endpoint for user status (id of the logged in user, or no logged in user)
 * Validate that emails are emails
+```
