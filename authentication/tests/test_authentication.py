@@ -6,14 +6,12 @@ import json
 import unittest
 
 from flask.ext.login import make_secure_token
-from flask.ext.sqlalchemy import orm
 from requests import codes
 from werkzeug.http import parse_cookie
 
 from authentication.authentication import (
     app,
     bcrypt,
-    db,
     load_user_from_id,
     load_user_from_token,
     User,
@@ -22,29 +20,13 @@ from authentication.authentication import (
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
-class DatabaseTestCase(unittest.TestCase):
-    """
-    Set up and tear down an application with an in memory database for testing.
-    """
-
-    def setUp(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        self.app = app.test_client()
-
-        with app.app_context():
-            db.create_all()
-
-    def tearDown(self):
-        with app.app_context():
-            db.session.remove()
-            db.drop_all()
-
-
-class SignupTests(DatabaseTestCase):
+class SignupTests(unittest.TestCase):
     """
     Tests for the user sign up endpoint at ``/signup``.
     """
+
+    def setUp(self):
+        self.app = app.test_client()
 
     def test_signup(self):
         """
@@ -139,10 +121,13 @@ class SignupTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LoginTests(DatabaseTestCase):
+class LoginTests(unittest.TestCase):
     """
     Tests for the user log in endpoint at ``/login``.
     """
+
+    def setUp(self):
+        self.app = app.test_client()
 
     def test_login(self):
         """
@@ -266,10 +251,13 @@ class LoginTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LogoutTests(DatabaseTestCase):
+class LogoutTests(unittest.TestCase):
     """
     Tests for the user log out endpoint at ``/logout``.
     """
+
+    def setUp(self):
+        self.app = app.test_client()
 
     def test_logout(self):
         """
@@ -321,7 +309,7 @@ class LogoutTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LoadUserTests(DatabaseTestCase):
+class LoadUserTests(unittest.TestCase):
     """
     Tests for ``load_user_from_id``, which is a function required by
     Flask-Login.
@@ -349,7 +337,7 @@ class LoadUserTests(DatabaseTestCase):
             self.assertIsNone(load_user_from_id(user_id='email'))
 
 
-class LoadUserFromTokenTests(DatabaseTestCase):
+class LoadUserFromTokenTests(unittest.TestCase):
     """
     Tests for ``load_user_from_token``, which is a function required by
     Flask-Login when using secure "Alternative Tokens".
@@ -409,7 +397,7 @@ class LoadUserFromTokenTests(DatabaseTestCase):
             self.assertIsNone(load_user_from_token(auth_token=token))
 
 
-class UserTests(DatabaseTestCase):
+class UserTests(unittest.TestCase):
     """
     Tests for the ``User`` model.
     """
@@ -421,19 +409,6 @@ class UserTests(DatabaseTestCase):
         """
         user = User(email='email', password_hash='password_hash')
         self.assertEqual(user.get_id(), 'email')
-
-    def test_email_unique(self):
-        """
-        There cannot be two users with the same email address.
-        """
-        user_1 = User(email='email', password_hash='password_hash')
-        user_2 = User(email='email', password_hash='different_hash')
-        with app.app_context():
-            db.session.add(user_1)
-            db.session.commit()
-            db.session.add(user_2)
-            with self.assertRaises(orm.exc.FlushError):
-                db.session.commit()
 
     def test_get_auth_token(self):
         """

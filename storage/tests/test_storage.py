@@ -14,9 +14,10 @@ Tests for storage service.
 import json
 import unittest
 
+from flask.ext.sqlalchemy import orm
 from requests import codes
 
-from storage.storage import app, db
+from storage.storage import app, db, User
 
 USER_DATA = {'email': 'alice@example.com', 'password_hash': '123abc'}
 
@@ -177,3 +178,22 @@ class GetUserTests(DatabaseTestCase):
             '/users/{email}'.format(email=USER_DATA['email']),
             content_type='text/html')
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
+
+
+class UserTests(DatabaseTestCase):
+    """
+    Tests for the ``User`` model.
+    """
+
+    def test_email_unique(self):
+        """
+        There cannot be two users with the same email address.
+        """
+        user_1 = User(email='email', password_hash='password_hash')
+        user_2 = User(email='email', password_hash='different_hash')
+        with app.app_context():
+            db.session.add(user_1)
+            db.session.commit()
+            db.session.add(user_2)
+            with self.assertRaises(orm.exc.FlushError):
+                db.session.commit()
