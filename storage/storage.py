@@ -6,11 +6,8 @@ import os
 
 from flask import Flask, jsonify, request
 from flask.ext.bcrypt import Bcrypt
-from flask.ext.login import (
-    LoginManager,
-    make_secure_token,
-    UserMixin,
-)
+from flask.ext.login import LoginManager
+
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_jsonschema import JsonSchema, ValidationError
 from flask_negotiate import consumes
@@ -20,32 +17,12 @@ from requests import codes
 db = SQLAlchemy()
 
 
-class User(db.Model, UserMixin):
+class User(db.Model):
     """
     A user has an email and password.
     """
     email = db.Column(db.String, primary_key=True)
     password_hash = db.Column(db.String)
-
-    def get_auth_token(self):
-        """
-        See https://flask-login.readthedocs.org/en/latest/#alternative-tokens
-
-        :return: A secure token unique to this ``User`` with the current
-            ``password_hash``.
-        :rtype: string
-        """
-        return make_secure_token(self.email, self.password_hash)
-
-    def get_id(self):
-        """
-        See https://flask-login.readthedocs.org/en/latest/#your-user-class
-
-        :return: the email address to satify Flask-Login's requirements. This
-            is used in conjunction with ``load_user`` for session management.
-        :rtype: string
-        """
-        return self.email
 
 
 def create_app(database_uri):
@@ -158,7 +135,7 @@ def signup():
     :status 409: There already exists a user with the given ``email``.
     """
     email = request.json['email']
-    password = request.json['password_hash']
+    password_hash = request.json['password_hash']
 
     if load_user_from_id(email) is not None:
         return jsonify(
