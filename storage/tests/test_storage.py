@@ -44,10 +44,10 @@ class CreateUserTests(DatabaseTestCase):
     Tests for the user creation endpoint at ``POST /users``.
     """
 
-    def test_signup(self):
+    def test_create_user(self):
         """
-        A signup ``POST`` request with an email address and password returns a
-        JSON response with user credentials and a CREATED status.
+        A signup ``POST`` request with an email address and password hash
+        returns a JSON response with user details and a CREATED status.
         """
         response = self.app.post(
             '/users',
@@ -62,10 +62,13 @@ class CreateUserTests(DatabaseTestCase):
         A signup request without an email address returns a BAD_REQUEST status
         code and an error message.
         """
+        data = USER_DATA.copy()
+        data.pop('email')
+
         response = self.app.post(
-            '/signup',
+            '/users',
             content_type='application/json',
-            data=json.dumps({'password_hash': USER_DATA['password_hash']}))
+            data=json.dumps(data))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
         expected = {
@@ -76,18 +79,21 @@ class CreateUserTests(DatabaseTestCase):
 
     def test_missing_password_hash(self):
         """
-        A signup request without a password returns a BAD_REQUEST status code
-        and an error message.
+        A signup request without a password hash returns a BAD_REQUEST status
+        code and an error message.
         """
+        data = USER_DATA.copy()
+        data.pop('password_hash')
+
         response = self.app.post(
-            '/signup',
+            '/users',
             content_type='application/json',
             data=json.dumps({'email': USER_DATA['email']}))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
         expected = {
             'title': 'There was an error validating the given arguments.',
-            'detail': "'password' is a required property",
+            'detail': "'password_hash' is a required property",
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
@@ -97,13 +103,13 @@ class CreateUserTests(DatabaseTestCase):
         CONFLICT status code and error details.
         """
         self.app.post(
-            '/signup',
+            '/users',
             content_type='application/json',
             data=json.dumps(USER_DATA))
         data = USER_DATA.copy()
         data['password'] = 'different'
         response = self.app.post(
-            '/signup',
+            '/users',
             content_type='application/json',
             data=json.dumps(USER_DATA))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -120,7 +126,7 @@ class CreateUserTests(DatabaseTestCase):
         If a Content-Type header other than 'application/json' is given, an
         UNSUPPORTED_MEDIA_TYPE status code is given.
         """
-        response = self.app.post('/signup', content_type='text/html')
+        response = self.app.post('/users', content_type='text/html')
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
