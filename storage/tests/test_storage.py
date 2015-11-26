@@ -140,54 +140,28 @@ class GetUserTests(DatabaseTestCase):
         TODO
         """
         self.app.post(
-            '/signup',
+            '/users',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
+        response = self.app.get(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='application/json')
         self.assertEqual(response.status_code, codes.OK)
 
     def test_non_existant_user(self):
         """
-        Attempting to log in as a user which has been not been signed up
-        returns a NOT_FOUND status code and error details..
+        Attempting to log in as a user which does not exist returns a NOT_FOUND
+        status code and error details.
         """
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
+        response = self.app.get(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='application/json')
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.NOT_FOUND)
         expected = {
             'title': 'The requested user does not exist.',
             'detail': 'No user exists with the email "{email}"'.format(
                 email=USER_DATA['email']),
-        }
-        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
-
-    def test_wrong_password(self):
-        """
-        Attempting to log in with an incorrect password returns an UNAUTHORIZED
-        status code and error details.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        data = USER_DATA.copy()
-        data['password'] = 'incorrect'
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(data))
-        self.assertEqual(response.headers['Content-Type'], 'application/json')
-        self.assertEqual(response.status_code, codes.UNAUTHORIZED)
-        expected = {
-            'title': 'An incorrect password was provided.',
-            'detail': 'The password for the user "{email}" does not match the '
-                      'password provided.'.format(email=USER_DATA['email']),
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
