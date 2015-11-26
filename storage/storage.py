@@ -103,7 +103,16 @@ def get_user(email):
     :status 409: There already exists a user with the given ``email``.
     """
     user = load_user_from_id(email)
-    return jsonify(email=user.email, password_hash=user.password_hash), codes.OK
+
+    if user is None:
+        return jsonify(
+            title='The requested user does not exist.',
+            detail='No user exists with the email "{email}"'.format(
+                email=email),
+        ), codes.NOT_FOUND
+
+    return (jsonify(email=user.email, password_hash=user.password_hash),
+            codes.OK)
 
 
 @app.route('/users', methods=['POST'])
