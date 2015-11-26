@@ -102,7 +102,13 @@ def load_user_from_token(auth_token):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    for user in User.query.all():
+    response = requests.get('http://storage:5001/users/')
+
+    for details in json.loads(response):
+        user = User(
+            email=details['email'],
+            password_hash=details['password_hash'],
+        )
         if user.get_auth_token() == auth_token:
             return user
 
