@@ -77,6 +77,10 @@ app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+# Inputs can be validated using JSON schema.
+# Schemas are in app.config['JSONSCHEMA_DIR'].
+# See https://github.com/mattupstate/flask-jsonschema for details.
 app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'schemas')
 jsonschema = JsonSchema(app)
 
