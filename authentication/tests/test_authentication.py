@@ -3,6 +3,7 @@ Tests for authentication.authentication.
 """
 
 import requests_mock
+import responses
 
 import json
 import unittest
@@ -30,13 +31,13 @@ class SignupTests(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
 
-    @requests_mock.mock()
-    def test_signup(self, m):
+    @responses.activate
+    def test_signup(self):
         """
         A signup ``POST`` request with an email address and password returns a
         JSON response with user credentials and a CREATED status.
         """
-        def my_callable(first, second):
+        def request_callback(request):
             from storage.storage import app as storage_app
             from storage.storage import db as storage_db
             storage_app.config['TESTING'] = True
@@ -45,13 +46,18 @@ class SignupTests(unittest.TestCase):
                 storage_db.create_all()
             client = storage_app.test_client()
             NEW_USER_DATA = {'email': 'alice@example.com', 'password_hash': '123abc'}
-            response = client.post('/users', content_type='application.json', data=json.dumps(NEW_USER_DATA))
-
+            response = client.post('/users', content_type='application/json', data=json.dumps(NEW_USER_DATA))
             # import pdb; pdb.set_trace()
-            pass
+            return (
+                response.status_code,
+                {key: value for (key, value) in response.headers},
+                response.data)
 
-        m.post('http://storage:5001/users', headers={'Content-Type': 'application/json'},
-                text=my_callable)
+        responses.add_callback(
+            responses.POST, 'http://storage:5001/users',
+            callback=request_callback,
+            content_type='application/json',
+        )
 
         response = self.app.post(
             '/signup',

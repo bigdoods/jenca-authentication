@@ -232,7 +232,7 @@ def signup():
         'password_hash': bcrypt.generate_password_hash(password).decode('utf8'),
     }
 
-    requests.post(
+    response = requests.post(
         'http://storage:5001/users',
         headers={'Content-Type': 'application/json'},
         data=json.dumps(data),
