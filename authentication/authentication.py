@@ -4,7 +4,7 @@ An authentication service for use in a Jenca Cloud.
 
 import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, json
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import (
     LoginManager,
@@ -18,6 +18,7 @@ from flask.ext.login import (
 from flask_jsonschema import JsonSchema, ValidationError
 from flask_negotiate import consumes
 
+import requests
 from requests import codes
 
 
@@ -81,8 +82,10 @@ def load_user_from_id(user_id):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    return User()
-    return User.query.filter_by(email=user_id).first()
+    response = requests.get('http://storage:5001/users/{email}'.format(
+        email=user_id))
+    details = json.loads(response)
+    return User(email=details['email'], password_hash=details['password_hash'])
 
 
 @login_manager.token_loader
@@ -197,8 +200,6 @@ def signup():
         created.
     :status 409: There already exists a user with the given ``email``.
     """
-    import requests
-
     email = request.json['email']
     password = request.json['password']
 
@@ -211,7 +212,7 @@ def signup():
 
     password_hash = bcrypt.generate_password_hash(password)
 
-    requests.post('http://storage:5001/user/create', data=jsonify(
+    requests.post('http://storage:5001/users', data=jsonify(
         email=email,
         password_hash=password_hash,
     ))
