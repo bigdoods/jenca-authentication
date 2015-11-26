@@ -26,9 +26,9 @@ To run commands against the API, on OS X with Docker Machine for example:
 $ docker-machine ip dev
 $ 192.168.99.100
 $ curl -X POST \
+  -H "Content-Type: application/json" \
   -g '192.168.99.100:5000/signup' \
-  -d email='user@example.com' \
-  -d password='secret' \
+  -d '{"email": "user@example.com","password":"secret"}' \
   -c ~/Desktop/my_cookie
 ```
 
@@ -58,3 +58,8 @@ To view this built documentation, run:
 ```
 $ open docs/build/html/index.html
 ```
+
+## TODO
+
+* Better persistence of the database with Docker volumes (maybe a different service or container for persistence).
+* /status endpoint for user status (id of the logged in user, or no logged in user)

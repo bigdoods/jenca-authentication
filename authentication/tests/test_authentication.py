@@ -51,7 +51,10 @@ class SignupTests(DatabaseTestCase):
         A signup ``POST`` request with an email address and password returns a
         JSON response with user credentials and a CREATED status.
         """
-        response = self.app.post('/signup', data=USER_DATA)
+        response = self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.CREATED)
         self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
@@ -60,29 +63,64 @@ class SignupTests(DatabaseTestCase):
         """
         Passwords are hashed before being saved to the database.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         with app.app_context():
             user = User.query.filter_by(email=USER_DATA['email']).first()
         self.assertTrue(bcrypt.check_password_hash(user.password_hash,
                                                    USER_DATA['password']))
 
-    def test_missing_data(self):
+    def test_missing_email(self):
         """
-        A signup request without an email address or password returns a
-        BAD_REQUEST status code.
+        A signup request without an email address returns a BAD_REQUEST status
+        code and an error message.
         """
-        response = self.app.post('/signup', data={})
+        response = self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps({'password': USER_DATA['password']}))
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.BAD_REQUEST)
+        expected = {
+            'title': 'There was an error validating the given arguments.',
+            'detail': "'email' is a required property",
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_missing_password(self):
+        """
+        A signup request without a password returns a BAD_REQUEST status code
+        and an error message.
+        """
+        response = self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps({'email': USER_DATA['email']}))
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.BAD_REQUEST)
+        expected = {
+            'title': 'There was an error validating the given arguments.',
+            'detail': "'password' is a required property",
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
     def test_existing_user(self):
         """
         A signup request for an email address which already exists returns a
         CONFLICT status code and error details.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         data = USER_DATA.copy()
         data['password'] = 'different'
-        response = self.app.post('/signup', data=data)
+        response = self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.CONFLICT)
         expected = {
@@ -91,6 +129,14 @@ class SignupTests(DatabaseTestCase):
                 email=USER_DATA['email']),
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.post('/signup', content_type='text/html')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
 class LoginTests(DatabaseTestCase):
@@ -103,16 +149,25 @@ class LoginTests(DatabaseTestCase):
         Logging in as a user which has been signed up returns an OK status
         code.
         """
-        self.app.post('/signup', data=USER_DATA)
-        response = self.app.post('/login', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         self.assertEqual(response.status_code, codes.OK)
 
-    def test_login_non_existant(self):
+    def test_non_existant_user(self):
         """
         Attempting to log in as a user which has been not been signed up
         returns a NOT_FOUND status code and error details..
         """
-        response = self.app.post('/login', data=USER_DATA)
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.NOT_FOUND)
         expected = {
@@ -122,15 +177,21 @@ class LoginTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
-    def test_login_wrong_password(self):
+    def test_wrong_password(self):
         """
         Attempting to log in with an incorrect password returns an UNAUTHORIZED
         status code and error details.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         data = USER_DATA.copy()
         data['password'] = 'incorrect'
-        response = self.app.post('/login', data=data)
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(data))
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
         expected = {
@@ -145,8 +206,14 @@ class LoginTests(DatabaseTestCase):
         A "Remember Me" token is in the response header of a successful login
         with the value of ``User.get_auth_token`` for the logged in user.
         """
-        self.app.post('/signup', data=USER_DATA)
-        response = self.app.post('/login', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         cookies = response.headers.getlist('Set-Cookie')
 
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
@@ -155,6 +222,48 @@ class LoginTests(DatabaseTestCase):
         with app.app_context():
             user = load_user_from_id(user_id=USER_DATA['email'])
             self.assertEqual(token, user.get_auth_token())
+
+    def test_missing_email(self):
+        """
+        A login request without an email address returns a BAD_REQUEST status
+        code and an error message.
+        """
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps({'password': USER_DATA['password']}))
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.BAD_REQUEST)
+        expected = {
+            'title': 'There was an error validating the given arguments.',
+            'detail': "'email' is a required property",
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_missing_password(self):
+        """
+        A login request without a password returns a BAD_REQUEST status code
+        and an error message.
+        """
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps({'email': USER_DATA['email']}))
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.BAD_REQUEST)
+        expected = {
+            'title': 'There was an error validating the given arguments.',
+            'detail': "'password' is a required property",
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.post('/login', content_type='text/html')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
 class LogoutTests(DatabaseTestCase):
@@ -167,9 +276,15 @@ class LogoutTests(DatabaseTestCase):
         A POST request to log out when a user is logged in returns an OK status
         code.
         """
-        self.app.post('/signup', data=USER_DATA)
-        self.app.post('/login', data=USER_DATA)
-        response = self.app.post('/logout')
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.OK)
 
     def test_not_logged_in(self):
@@ -177,7 +292,7 @@ class LogoutTests(DatabaseTestCase):
         A POST request to log out when no user is logged in returns an
         UNAUTHORIZED status code.
         """
-        response = self.app.post('/logout')
+        response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
 
     def test_logout_twice(self):
@@ -185,11 +300,25 @@ class LogoutTests(DatabaseTestCase):
         A POST request to log out, after a successful log out attempt returns
         an UNAUTHORIZED status code.
         """
-        self.app.post('/signup', data=USER_DATA)
-        self.app.post('/login', data=USER_DATA)
-        self.app.post('/logout')
-        response = self.app.post('/logout')
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        self.app.post('/logout', content_type='application/json')
+        response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.post('/logout')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
 class LoadUserTests(DatabaseTestCase):
@@ -203,7 +332,10 @@ class LoadUserTests(DatabaseTestCase):
         If a user exists with the email given as the user ID to
         ``load_user_from_id``, that user is returned.
         """
-        self.app.post('/signup', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         with app.app_context():
             self.assertEqual(load_user_from_id(user_id=USER_DATA['email']),
                              User(email=USER_DATA['email']))
@@ -228,8 +360,14 @@ class LoadUserFromTokenTests(DatabaseTestCase):
         A user is loaded if their token is provided to
         ``load_user_from_token``.
         """
-        self.app.post('/signup', data=USER_DATA)
-        response = self.app.post('/login', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
         cookies = response.headers.getlist('Set-Cookie')
 
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
@@ -251,8 +389,15 @@ class LoadUserFromTokenTests(DatabaseTestCase):
         If a user's password (hash) is modified, their token is no longer
         valid.
         """
-        self.app.post('/signup', data=USER_DATA)
-        response = self.app.post('/login', data=USER_DATA)
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+
         cookies = response.headers.getlist('Set-Cookie')
 
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]

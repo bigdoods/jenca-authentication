@@ -15,6 +15,8 @@ from flask.ext.login import (
     UserMixin,
 )
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask_jsonschema import JsonSchema, ValidationError
+from flask_negotiate import consumes
 
 from requests import codes
 
@@ -76,6 +78,12 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+# Inputs can be validated using JSON schema.
+# Schemas are in app.config['JSONSCHEMA_DIR'].
+# See https://github.com/mattupstate/flask-jsonschema for details.
+app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'schemas')
+jsonschema = JsonSchema(app)
+
 
 @login_manager.user_loader
 def load_user_from_id(user_id):
@@ -116,7 +124,25 @@ def load_user_from_token(auth_token):
             return user
 
 
+@app.errorhandler(ValidationError)
+def on_validation_error(error):
+    """
+    :resjson string title: An explanation that there was a validation error.
+    :resjson string message: The precise validation error.
+    :status 400:
+    """
+    return jsonify(
+        title='There was an error validating the given arguments.',
+        # By default on Python 2 errors will look like:
+        # "u'password' is a required property".
+        # This removes all "u'"s, and so could be dangerous.
+        detail=error.message.replace("u'", "'"),
+    ), codes.BAD_REQUEST
+
+
 @app.route('/login', methods=['POST'])
+@consumes('application/json')
+@jsonschema.validate('user', 'get')
 def login():
     """
     Log in a given user.
@@ -125,6 +151,7 @@ def login():
     :type email: string
     :param password: A password associated with the given ``email`` address.
     :type password: string
+    :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resheader Set-Cookie: A ``remember_token``.
     :resjson string email: The email address which has been logged in.
@@ -134,8 +161,8 @@ def login():
     :status 404: No user can be found with the given ``email``.
     :status 401: The given ``password`` is incorrect.
     """
-    email = request.form['email']
-    password = request.form['password']
+    email = request.json['email']
+    password = request.json['password']
 
     user = load_user_from_id(user_id=email)
     if user is None:
@@ -158,6 +185,7 @@ def login():
 
 
 @app.route('/logout', methods=['POST'])
+@consumes('application/json')
 @login_required
 def logout():
     """
@@ -171,6 +199,8 @@ def logout():
 
 
 @app.route('/signup', methods=['POST'])
+@consumes('application/json')
+@jsonschema.validate('user', 'create')
 def signup():
     """
     Sign up a new user.
@@ -179,6 +209,7 @@ def signup():
     :type email: string
     :param password: A password to associate with the given ``email`` address.
     :type password: string
+    :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
     :resjson string password: The password of the new user.
@@ -186,8 +217,8 @@ def signup():
         created.
     :status 409: There already exists a user with the given ``email``.
     """
-    email = request.form['email']
-    password = request.form['password']
+    email = request.json['email']
+    password = request.json['password']
 
     if load_user_from_id(email) is not None:
         return jsonify(
