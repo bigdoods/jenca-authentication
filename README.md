@@ -30,6 +30,15 @@ $ curl -X POST \
   -g '192.168.99.100:5000/signup' \
   -d '{"email": "user@example.com","password":"secret"}' \
   -c ~/Desktop/my_cookie
+$ curl -X POST \
+  -H "Content-Type: application/json" \
+  -g '192.168.99.100:5000/login' \
+  -d '{"email": "user@example.com","password":"secret"}' \
+  -b ~/Desktop/my_cookie
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -g '192.168.99.100:5000/logout' \
+  -b ~/Desktop/my_cookie
 ```
 
 ## Development
