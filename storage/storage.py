@@ -46,8 +46,6 @@ def create_app(database_uri):
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
                                          'sqlite:///:memory:')
 app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
-login_manager = LoginManager()
-login_manager.init_app(app)
 
 # Inputs can be validated using JSON schema.
 # Schemas are in app.config['JSONSCHEMA_DIR'].
