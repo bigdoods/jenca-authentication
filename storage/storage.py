@@ -85,7 +85,7 @@ def on_validation_error(error):
 
 @app.route('/users', methods=['POST'])
 @consumes('application/json')
-# @jsonschema.validate('user', 'create')
+@jsonschema.validate('users', 'create')
 def create_user():
     """
     Create a new user.

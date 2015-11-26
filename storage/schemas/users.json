@@ -3,16 +3,8 @@
     "type": "object",
     "properties": {
       "email": {},
-      "password": {}
+      "password_hash": {}
     },
-    "required": ["email", "password"]
-  },
-  "get": {
-    "type": "object",
-    "properties": {
-      "email": {},
-      "password": {}
-    },
-    "required": ["email", "password"]
+    "required": ["email", "password_hash"]
   }
 }
