@@ -5,7 +5,6 @@ An storage service for use by a Jenca Cloud authentication service.
 import os
 
 from flask import Flask, jsonify, request
-from flask.ext.login import LoginManager
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_jsonschema import JsonSchema, ValidationError
@@ -85,13 +84,8 @@ def on_validation_error(error):
 @consumes('application/json')
 def get_user(email):
     """
-    Create a new user.
+    Get information about particular user.
 
-    :param email: The email address of the new user.
-    :type email: string
-    :param password_hash: A password hash to associate with the given ``email``
-        address.
-    :type password: string
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
@@ -124,12 +118,12 @@ def create_user():
     :type email: string
     :param password_hash: A password hash to associate with the given ``email``
         address.
-    :type password: string
+    :type password_hash: string
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
-    :resjson string password_hash: The password of the new user.
-    :status 200: A user with the given ``email`` and ``password`` has been
+    :resjson string password_hash: The password hash of the new user.
+    :status 200: A user with the given ``email`` and ``password_hash`` has been
         created.
     :status 409: There already exists a user with the given ``email``.
     """
