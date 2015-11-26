@@ -219,22 +219,23 @@ def signup():
     email = request.json['email']
     password = request.json['password']
 
-    if load_user_from_id(email) is not None:
-        return jsonify(
-            title='There is already a user with the given email address.',
-            detail='A user already exists with the email "{email}"'.format(
-                email=email),
-        ), codes.CONFLICT
+    # if load_user_from_id(email) is not None:
+    #     return jsonify(
+    #         title='There is already a user with the given email address.',
+    #         detail='A user already exists with the email "{email}"'.format(
+    #             email=email),
+    #     ), codes.CONFLICT
 
-    password_hash = bcrypt.generate_password_hash(password)
+
+    data = {
+        'email': email,
+        'password_hash': bcrypt.generate_password_hash(password).decode('utf8'),
+    }
 
     requests.post(
         'http://storage:5001/users',
         headers={'Content-Type': 'application/json'},
-        data=json.dumps({
-            'email': email,
-            'password_hash': password_hash.decode('utf8'),
-        }),
+        data=json.dumps(data),
     )
 
     return jsonify(email=email, password=password), codes.CREATED
