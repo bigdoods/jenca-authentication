@@ -7,9 +7,7 @@ Tests for storage service.
 # TODO Put the docs for this API in the docs
 # TODO move things around so that all of the source is in one place (maybe
 # with a `common` package)
-# TODO change Travis to run these tests too
 # TODO Verified? Fake for this for the authentication tests
-# TODO rip some tests out of authentication
 
 import json
 import unittest
