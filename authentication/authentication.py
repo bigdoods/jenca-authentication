@@ -217,6 +217,9 @@ def signup():
         created.
     :status 409: There already exists a user with the given ``email``.
     """
+    import requests
+    requests.post('http://storage:5001/signup', data="{'email': 'foo@gmail.com', 'password': 'lop'}")
+
     email = request.json['email']
     password = request.json['password']
 
