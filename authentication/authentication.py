@@ -233,7 +233,7 @@ def signup():
         headers={'Content-Type': 'application/json'},
         data=json.dumps({
             'email': email,
-            'password_hash': str(password_hash),
+            'password_hash': password_hash.decode('utf8'),
         }),
     )
 
