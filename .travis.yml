@@ -37,7 +37,7 @@ script:
 after_success:
   # Sends the coverage report to coveralls.io which can report to Pull Requests
   # and track test coverage over time.
-  - "coveralls"
+  "coveralls"
 # Cache pip dependencies.
 # See http://docs.travis-ci.com/user/caching/#pip-cache.
 cache:
