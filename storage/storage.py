@@ -151,6 +151,8 @@ def users_route():
 
     **GET**:
 
+    Get information about all users.
+
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjsonarr string email: The email address of a user.
