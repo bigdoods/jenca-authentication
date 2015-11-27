@@ -164,6 +164,14 @@ class GetUsersTests(InMemoryStorageTests):
         A ``GET`` request for information about all users returns an OK status
         code and an empty array when there are no users.
         """
+        response = self.storage_app.get(
+            '/users/',
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.OK)
+        self.assertEqual(json.loads(response.data.decode('utf8')), {})
 
     def test_with_users(self):
         """
