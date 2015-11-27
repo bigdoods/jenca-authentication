@@ -2,13 +2,13 @@
 Tests for authentication.authentication.
 """
 
-import responses
-
 import json
+import re
 import unittest
 
 from flask.ext.login import make_secure_token
 from requests import codes
+import responses
 from werkzeug.http import parse_cookie
 
 from authentication.authentication import (
@@ -19,12 +19,10 @@ from authentication.authentication import (
     User,
 )
 
-USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
-
-
-
 # TODO move this to testtools
 from storage.tests.test_storage import DatabaseTestCase
+
+USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
 class SignupTests(DatabaseTestCase):
@@ -36,7 +34,6 @@ class SignupTests(DatabaseTestCase):
         super(SignupTests, self).setUp()
         self.app = app.test_client()
 
-        import re
         responses.add_callback(
             responses.GET, re.compile('http://storage:5001/users/.+'),
             callback=self.request_callback,
