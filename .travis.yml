@@ -34,6 +34,8 @@ script:
   - sphinx-build -W -b spelling -d build/doctrees docs/source build/spelling
   # Run all discoverable tests, but set the source directories so that the coverage tool knows not to include coverage for all dependencies.
   - "coverage run --source=authentication,storage -m unittest discover"
+  # End-to-end tests
+  - sphinx-build -W -b doctest -d build/doctrees docs/source build/doctest
 after_success:
   # Sends the coverage report to coveralls.io which can report to Pull Requests
   # and track test coverage over time.
