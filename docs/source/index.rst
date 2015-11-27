@@ -16,7 +16,8 @@ Storage Service API Endpoints
 Example Use
 ===========
 
-.. doctest::
+.. TODO: Get Travis to run this
+.. TODO support different docker hosts, probably with a test setup
 
    >>> import subprocess
    >>> import json
@@ -35,5 +36,5 @@ Example Use
 
 .. testcleanup::
 
-   >>> url = authentication_url + '/delete/' + data['email']
-   >>> requests.delete()
+   url = authentication_url + '/users/' + data['email']
+   requests.delete(url, headers=headers)
