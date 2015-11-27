@@ -1,4 +1,3 @@
-coverage # Allows us to measure code coverage
 doc8 # Style check documentation
 flake8 # Code analysis tool with linting
 PyEnchant # Dictionary interaction for spellchecking
