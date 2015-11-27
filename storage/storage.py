@@ -106,10 +106,30 @@ def get_user(email):
     return return_data, codes.OK
 
 
+@jsonschema.validate('users', 'create')
+def create_user():
+    """
+    Create a new user. See ``users_route`` for details.
+    """
+    email = request.json['email']
+    password_hash = request.json['password_hash']
+
+    if load_user_from_id(email) is not None:
+        return jsonify(
+            title='There is already a user with the given email address.',
+            detail='A user already exists with the email "{email}"'.format(
+                email=email),
+        ), codes.CONFLICT
+
+    user = User(email=email, password_hash=password_hash)
+    db.session.add(user)
+    db.session.commit()
+
+    return jsonify(email=email, password_hash=password_hash), codes.CREATED
+
+
 @app.route('/users', methods=['GET', 'POST'])
 @consumes('application/json')
-# TODO validate schema only for POST
-# @jsonschema.validate('users', 'create')
 def users_route():
     """
     # TODO figure out separating docs for get and post
@@ -130,21 +150,7 @@ def users_route():
     :status 409: There already exists a user with the given ``email``.
     """
     if request.method == 'POST':
-        email = request.json['email']
-        password_hash = request.json['password_hash']
-
-        if load_user_from_id(email) is not None:
-            return jsonify(
-                title='There is already a user with the given email address.',
-                detail='A user already exists with the email "{email}"'.format(
-                    email=email),
-            ), codes.CONFLICT
-
-        user = User(email=email, password_hash=password_hash)
-        db.session.add(user)
-        db.session.commit()
-
-        return jsonify(email=email, password_hash=password_hash), codes.CREATED
+        return create_user()
     elif request.method == 'GET':
         details = [
             {'email': user.email, 'password_hash': user.password_hash} for user
