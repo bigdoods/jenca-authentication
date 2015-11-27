@@ -178,6 +178,27 @@ class GetUsersTests(InMemoryStorageTests):
         A ``GET`` request for information about all users returns an OK status
         code and an array of user information.
         """
+        users = [
+            USER_DATA,
+            {'email': 'bob@example.com', 'password_hash': '123abc'},
+            {'email': 'carol@example.com', 'password_hash': '456def'},
+            {'email': 'dan@example.com', 'password_hash': '789efg'},
+        ]
+
+        for user in users:
+            self.storage_app.post(
+                '/users',
+                content_type='application/json',
+                data=json.dumps(user))
+
+        response = self.storage_app.get(
+            '/users/',
+            content_type='application/json',
+        )
+
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.OK)
+        self.assertEqual(json.loads(response.data.decode('utf8')), users)
 
     def test_incorrect_content_type(self):
         """
