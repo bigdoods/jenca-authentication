@@ -28,8 +28,16 @@ $ 192.168.99.100
 $ curl -X POST \
   -H "Content-Type: application/json" \
   -g '192.168.99.100:5000/signup' \
+  -d '{"email": "user@example.com","password":"secret"}'
+$ curl -X POST \
+  -H "Content-Type: application/json" \
+  -g '192.168.99.100:5000/login' \
   -d '{"email": "user@example.com","password":"secret"}' \
-  -c ~/Desktop/my_cookie
+  --cookie-jar ~/Desktop/my_cookie
+$ curl -X POST \
+  -H "Content-Type: application/json" \
+  -g '192.168.99.100:5000/logout' \
+  --cookie ~/Desktop/my_cookie
 ```
 
 ## Development
