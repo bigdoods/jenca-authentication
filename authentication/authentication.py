@@ -122,7 +122,7 @@ def load_user_from_token(auth_token):
         headers={'Content-Type': 'application/json'},
     )
 
-    for details in json.loads(response.data):
+    for details in json.loads(response.text):
         user = User(
             email=details['email'],
             password_hash=details['password_hash'],
