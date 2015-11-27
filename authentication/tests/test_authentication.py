@@ -484,6 +484,7 @@ class DeleteUserTests(AuthenticationTests):
 
         self.assertIsNone(load_user_from_id(user_id=USER_DATA['email']))
 
+    @responses.activate
     def test_non_existant_user(self):
         """
         A ``DELETE`` request for a user which does not exist returns a
