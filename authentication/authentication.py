@@ -88,6 +88,7 @@ def load_user_from_id(user_id):
     """
     response = requests.get(
         'http://storage:5001/users/{email}'.format(email=user_id),
+        headers={'Content-Type': 'application/json'},
     )
 
     if response.status_code == codes.OK:
@@ -219,12 +220,12 @@ def signup():
     email = request.json['email']
     password = request.json['password']
 
-    # if load_user_from_id(email) is not None:
-    #     return jsonify(
-    #         title='There is already a user with the given email address.',
-    #         detail='A user already exists with the email "{email}"'.format(
-    #             email=email),
-    #     ), codes.CONFLICT
+    if load_user_from_id(email) is not None:
+        return jsonify(
+            title='There is already a user with the given email address.',
+            detail='A user already exists with the email "{email}"'.format(
+                email=email),
+        ), codes.CONFLICT
 
 
     data = {
@@ -232,9 +233,7 @@ def signup():
         'password_hash': bcrypt.generate_password_hash(password).decode('utf8'),
     }
 
-    # import pdb; pdb.set_trace()
-
-    response = requests.post(
+    requests.post(
         'http://storage:5001/users',
         headers={'Content-Type': 'application/json'},
         data=json.dumps(data),

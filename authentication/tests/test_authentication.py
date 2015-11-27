@@ -36,6 +36,13 @@ class SignupTests(DatabaseTestCase):
         super(SignupTests, self).setUp()
         self.app = app.test_client()
 
+        import re
+        responses.add_callback(
+            responses.GET, re.compile('http://storage:5001/users/.+'),
+            callback=self.request_callback,
+            content_type='application/json',
+        )
+
         responses.add_callback(
             responses.POST, 'http://storage:5001/users',
             callback=self.request_callback,
@@ -44,10 +51,15 @@ class SignupTests(DatabaseTestCase):
 
     def request_callback(self, request):
         # TODO different things for post, get
-        response = self.storage_app.post(
-            request.path_url,
-            content_type=request.headers['Content-Type'],
-            data=request.body)
+        if request.method == 'POST':
+            response = self.storage_app.post(
+                request.path_url,
+                content_type=request.headers['Content-Type'],
+                data=request.body)
+        elif request.method == 'GET':
+            response = self.storage_app.get(
+                request.path_url,
+                content_type=request.headers['Content-Type'])
 
         return (
             response.status_code,
@@ -68,6 +80,7 @@ class SignupTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.CREATED)
         self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
 
+    @responses.activate
     def test_passwords_hashed(self):
         """
         Passwords are hashed before being saved to the database.
@@ -114,6 +127,7 @@ class SignupTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
+    @responses.activate
     def test_existing_user(self):
         """
         A signup request for an email address which already exists returns a
