@@ -4,7 +4,7 @@ Test tools for the storage service.
 
 import unittest
 
-from storage.storage import app as storage_app, db
+from storage.storage import app, db
 
 
 class InMemoryStorageTests(unittest.TestCase):
@@ -13,15 +13,15 @@ class InMemoryStorageTests(unittest.TestCase):
     """
 
     def setUp(self):
-        storage_app.config['TESTING'] = True
-        storage_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        self.storage_app = storage_app.test_client()
-        self.storage_url_map = storage_app.url_map
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.storage_app = app.test_client()
+        self.storage_url_map = app.url_map
 
-        with storage_app.app_context():
+        with app.app_context():
             db.create_all()
 
     def tearDown(self):
-        with storage_app.app_context():
+        with app.app_context():
             db.session.remove()
             db.drop_all()
