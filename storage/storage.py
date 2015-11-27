@@ -108,6 +108,7 @@ def get_user(email):
 
 @app.route('/users', methods=['GET', 'POST'])
 @consumes('application/json')
+# TODO validate schema only for POST
 # @jsonschema.validate('users', 'create')
 def users_route():
     """
