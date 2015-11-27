@@ -5,9 +5,6 @@ Tests for storage service.
 # TODO tests for getting all users
 # TODO update the docs
 # TODO Put the docs for this API in the docs
-# TODO move things around so that all of the source is in one place (maybe
-# with a `common` package)
-# TODO Verified? Fake for this for the authentication tests
 
 import json
 import unittest
