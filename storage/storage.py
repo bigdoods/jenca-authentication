@@ -17,8 +17,9 @@ db = SQLAlchemy()
 
 class User(db.Model):
     """
-    A user has an email and password.
+    A user has an email address and a password hash.
     """
+
     email = db.Column(db.String, primary_key=True)
     password_hash = db.Column(db.String)
 
