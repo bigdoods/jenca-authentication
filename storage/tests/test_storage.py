@@ -15,7 +15,7 @@ import unittest
 from flask.ext.sqlalchemy import orm
 from requests import codes
 
-from storage.storage import app, db, User
+from storage.storage import app as storage_app, db, User
 
 USER_DATA = {'email': 'alice@example.com', 'password_hash': '123abc'}
 
@@ -26,15 +26,15 @@ class DatabaseTestCase(unittest.TestCase):
     """
 
     def setUp(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        self.app = app.test_client()
+        storage_app.config['TESTING'] = True
+        storage_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        self.storage_app = storage_app.test_client()
 
-        with app.app_context():
+        with storage_app.app_context():
             db.create_all()
 
     def tearDown(self):
-        with app.app_context():
+        with storage_app.app_context():
             db.session.remove()
             db.drop_all()
 
@@ -49,7 +49,7 @@ class CreateUserTests(DatabaseTestCase):
         A ``POST /users`` request with an email address and password hash
         returns a JSON response with user details and a CREATED status.
         """
-        response = self.app.post(
+        response = self.storage_app.post(
             '/users',
             content_type='application/json',
             data=json.dumps(USER_DATA))
@@ -65,7 +65,7 @@ class CreateUserTests(DatabaseTestCase):
         data = USER_DATA.copy()
         data.pop('email')
 
-        response = self.app.post(
+        response = self.storage_app.post(
             '/users',
             content_type='application/json',
             data=json.dumps(data))
@@ -85,7 +85,7 @@ class CreateUserTests(DatabaseTestCase):
         data = USER_DATA.copy()
         data.pop('password_hash')
 
-        response = self.app.post(
+        response = self.storage_app.post(
             '/users',
             content_type='application/json',
             data=json.dumps({'email': USER_DATA['email']}))
@@ -102,13 +102,13 @@ class CreateUserTests(DatabaseTestCase):
         A ``POST /users`` request for an email address which already exists
         returns a CONFLICT status code and error details.
         """
-        self.app.post(
+        self.storage_app.post(
             '/users',
             content_type='application/json',
             data=json.dumps(USER_DATA))
         data = USER_DATA.copy()
         data['password'] = 'different'
-        response = self.app.post(
+        response = self.storage_app.post(
             '/users',
             content_type='application/json',
             data=json.dumps(USER_DATA))
@@ -126,7 +126,7 @@ class CreateUserTests(DatabaseTestCase):
         If a Content-Type header other than 'application/json' is given, an
         UNSUPPORTED_MEDIA_TYPE status code is given.
         """
-        response = self.app.post('/users', content_type='text/html')
+        response = self.storage_app.post('/users', content_type='text/html')
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
@@ -140,11 +140,11 @@ class GetUserTests(DatabaseTestCase):
         A ``GET`` request for an existing user an OK status code and the user's
         details.
         """
-        self.app.post(
+        self.storage_app.post(
             '/users',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        response = self.app.get(
+        response = self.storage_app.get(
             '/users/{email}'.format(email=USER_DATA['email']),
             content_type='application/json')
         self.assertEqual(response.status_code, codes.OK)
@@ -155,7 +155,7 @@ class GetUserTests(DatabaseTestCase):
         A ``GET`` request for a user which does not exist returns a NOT_FOUND
         status code and error details.
         """
-        response = self.app.get(
+        response = self.storage_app.get(
             '/users/{email}'.format(email=USER_DATA['email']),
             content_type='application/json')
         self.assertEqual(response.headers['Content-Type'], 'application/json')
@@ -179,7 +179,7 @@ class UserTests(DatabaseTestCase):
         """
         user_1 = User(email='email', password_hash='password_hash')
         user_2 = User(email='email', password_hash='different_hash')
-        with app.app_context():
+        with storage_app.app_context():
             db.session.add(user_1)
             db.session.commit()
             db.session.add(user_2)

@@ -2,7 +2,6 @@
 Tests for authentication.authentication.
 """
 
-import requests_mock
 import responses
 
 import json
@@ -23,13 +22,14 @@ from authentication.authentication import (
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
-class SignupTests(unittest.TestCase):
+# TODO move this to testtools
+from storage.tests.test_storage import DatabaseTestCase
+
+
+class SignupTests(DatabaseTestCase):
     """
     Tests for the user sign up endpoint at ``/signup``.
     """
-
-    def setUp(self):
-        self.app = app.test_client()
 
     @responses.activate
     def test_signup(self):
@@ -37,15 +37,11 @@ class SignupTests(unittest.TestCase):
         A signup ``POST`` request with an email address and password returns a
         JSON response with user credentials and a CREATED status.
         """
+
+        self.app = app.test_client()
+
         def request_callback(request):
-            from storage.storage import app as storage_app
-            from storage.storage import db as storage_db
-            storage_app.config['TESTING'] = True
-            storage_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-            with storage_app.app_context():
-                storage_db.create_all()
-            client = storage_app.test_client()
-            response = client.post(
+            response = self.storage_app.post(
                 request.path_url,
                 content_type=request.headers['Content-Type'],
                 data=request.body)
