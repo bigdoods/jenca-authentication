@@ -47,56 +47,63 @@ class AuthenticationTests(InMemoryStorageTests):
 
         self.app = app.test_client()
 
+        self.method_map = {
+            'POST': {
+                'responses': responses.POST,
+                'storage': self.storage_app.post,
+            },
+            'GET': {
+                'responses': responses.GET,
+                'storage': self.storage_app.get,
+            },
+            'DELETE': {
+                'responses': responses.DELETE,
+                'storage': self.storage_app.delete,
+            },
+            'OPTIONS': {
+                'responses': responses.OPTIONS,
+                'storage': self.storage_app.options,
+            },
+            'HEAD': {
+                'responses': responses.HEAD,
+                'storage': self.storage_app.head,
+            },
+        }
+
         for rule in self.storage_url_map.iter_rules():
             if rule.endpoint == 'static':
                 continue
 
-            for method in rule.methods:
-                if method == 'POST':
-                    responses.add_callback(
-                        responses.POST,
-                        urljoin(STORAGE_URL, rule.rule),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-                elif method == 'GET':
-                    # We assume here that everything is in the style:
-                    # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
-                    # not necessarily the case.
-                    pattern = urljoin(
-                        STORAGE_URL,
-                        re.sub(pattern='<.+>', repl='.+', string=rule.rule),
-                    )
+            # We assume here that everything is in the style:
+            # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
+            # not necessarily the case.
+            pattern = urljoin(
+                STORAGE_URL,
+                re.sub(pattern='<.+>', repl='.+', string=rule.rule),
+            )
 
-                    responses.add_callback(
-                        responses.GET, re.compile(pattern),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-                elif method in ('OPTIONS', 'HEAD'):
-                    # There is currently no need to support fake "OPTIONS"
-                    # or "HEAD" requests
-                    pass
-                else:  # pragma: no cover
-                    # Sometimes all methods are implemented, but this is still
-                    # useful, so do not count it as missing coverage.
-                    raise NotImplementedError()
+            for method in rule.methods:
+                responses.add_callback(
+                    self.method_map[method]['responses'],
+                    re.compile(pattern),
+                    callback=self.request_callback,
+                    content_type='application/json',
+                )
 
     def request_callback(self, request):
         """
         Given a request to the storage service, send an equivalent request to
         an in memory fake of the storage service and return some key details
         of the response.
+
+        :param request: The incoming request to pass onto the storage app.
+        :return: A tuple of status code, response headers and response data
+            from the storage app.
         """
-        if request.method == 'POST':
-            response = self.storage_app.post(
-                request.path_url,
-                content_type=request.headers['Content-Type'],
-                data=request.body)
-        elif request.method == 'GET':
-            response = self.storage_app.get(
-                request.path_url,
-                content_type=request.headers['Content-Type'])
+        response = self.method_map[request.method]['storage'](
+            request.path_url,
+            content_type=request.headers['Content-Type'],
+            data=request.body)
 
         return (
             response.status_code,
@@ -456,6 +463,65 @@ class LoadUserFromTokenTests(AuthenticationTests):
         If a token does not belong to a user, ``None`` is returned.
         """
         self.assertIsNone(load_user_from_token(auth_token='fake_token'))
+
+
+class DeleteUserTests(AuthenticationTests):
+    """
+    Tests for the delete user endpoint at ``DELETE /users/<email>``.
+    """
+
+    @responses.activate
+    def test_delete_user(self):
+        """
+        A ``DELETE`` request to delete a user returns an OK status code and the
+        email of the deleted user. The user no longer exists.
+        """
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+
+        response = self.app.delete(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='application/json')
+
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.OK)
+        self.assertEqual(
+            json.loads(response.data.decode('utf8')),
+            {'email': USER_DATA['email']})
+
+        self.assertIsNone(load_user_from_id(user_id=USER_DATA['email']))
+
+    @responses.activate
+    def test_non_existant_user(self):
+        """
+        A ``DELETE`` request for a user which does not exist returns a
+        NOT_FOUND status code and error details.
+        """
+        response = self.app.delete(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='application/json')
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.NOT_FOUND)
+        expected = {
+            'title': 'The requested user does not exist.',
+            'detail': 'No user exists with the email "{email}"'.format(
+                email=USER_DATA['email']),
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.delete(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='text/html',
+        )
+
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
 class UserTests(unittest.TestCase):
