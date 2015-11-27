@@ -81,7 +81,7 @@ def on_validation_error(error):
     ), codes.BAD_REQUEST
 
 
-@app.route('/users/<email>', methods=['GET'])
+@app.route('/users/<email>', methods=['GET', 'DELETE'])
 @consumes('application/json')
 def get_user(email):
     """

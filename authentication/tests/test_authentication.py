@@ -73,6 +73,18 @@ class AuthenticationTests(InMemoryStorageTests):
                         callback=self.request_callback,
                         content_type='application/json',
                     )
+                elif method == "DELETE":
+                    pattern = urljoin(
+                        STORAGE_URL,
+                        re.sub(pattern='<.+>', repl='.+', string=rule.rule),
+                    )
+
+                    responses.add_callback(
+                        responses.DELETE, re.compile(pattern),
+                        callback=self.request_callback,
+                        content_type='application/json',
+                    )
+
                 elif method in ('OPTIONS', 'HEAD'):
                     # There is currently no need to support fake "OPTIONS"
                     # or "HEAD" requests
