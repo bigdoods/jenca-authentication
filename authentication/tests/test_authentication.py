@@ -421,6 +421,24 @@ class LoadUserTests(AuthenticationTests):
         self.assertIsNone(load_user_from_id(user_id='email'))
 
 
+class StatusTests(AuthenticationTests):
+    """
+    Tests for the endpoint to get the current user's details.
+    """
+
+    def test_user_logged_in(self):
+        """
+        A ``GET`` request for information about the logged in user returns an OK status
+        code and an the user's email address if there is a logged in user.
+        """
+
+    def test_no_user_logged_in(self):
+        """
+        A ``GET`` request for information about the logged in user returns an OK status
+        code and no details if there is no logged in user.
+        """
+
+
 class LoadUserFromTokenTests(AuthenticationTests):
     """
     Tests for ``load_user_from_token``, which is a function required by
