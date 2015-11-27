@@ -86,15 +86,12 @@ def get_user(email):
     """
     Get information about particular user.
 
-    # TODO document response
-
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
     :resjson string password_hash: The password of the new user.
-    :status 200: A user with the given ``email`` and ``password`` has been
-        created.
-    :status 409: There already exists a user with the given ``email``.
+    :status 200: The requested user's information is returned.
+    :status 404: There is no user with the given ``email``.
     """
     user = load_user_from_id(email)
 
