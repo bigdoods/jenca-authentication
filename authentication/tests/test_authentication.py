@@ -47,7 +47,11 @@ class SignupTests(DatabaseTestCase):
         )
 
     def request_callback(self, request):
-        # TODO different things for post, get
+        """
+        Given a request to the storage service, send an equivalent request to
+        an in memory fake of the storage service and return some key details
+        of the response.
+        """
         if request.method == 'POST':
             response = self.storage_app.post(
                 request.path_url,
