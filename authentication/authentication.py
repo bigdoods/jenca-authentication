@@ -4,6 +4,12 @@ An authentication service for use in a Jenca Cloud.
 
 import os
 
+# This is necessary because urljoin moved between Python 2 and Python 3
+from future.standard_library import install_aliases
+install_aliases()
+
+from urllib.parse import urljoin
+
 from flask import Flask, jsonify, request, json
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import (
@@ -64,6 +70,8 @@ login_manager.init_app(app)
 app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'schemas')
 jsonschema = JsonSchema(app)
 
+STORAGE_URL = 'http://storage:5001'
+
 
 @login_manager.user_loader
 def load_user_from_id(user_id):
@@ -83,7 +91,7 @@ def load_user_from_id(user_id):
     :rtype: ``User`` or ``None``.
     """
     response = requests.get(
-        'http://storage:5001/users/{email}'.format(email=user_id),
+        urljoin(STORAGE_URL, 'users/{email}').format(email=user_id),
         headers={'Content-Type': 'application/json'},
     )
 
@@ -109,7 +117,8 @@ def load_user_from_token(auth_token):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    response = requests.get('http://storage:5001/users/')
+    # TODO set content type
+    response = requests.get(urljoin(STORAGE_URL, '/users'))
 
     for details in json.loads(response.data):
         user = User(
@@ -230,7 +239,7 @@ def signup():
     }
 
     requests.post(
-        'http://storage:5001/users',
+        urljoin(STORAGE_URL, '/users'),
         headers={'Content-Type': 'application/json'},
         data=json.dumps(data),
     )
