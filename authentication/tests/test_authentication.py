@@ -52,7 +52,7 @@ class AuthenticationTests(InMemoryStorageTests):
                 'responses': responses.POST,
                 'storage': self.storage_app.post,
             },
-            'GET':{
+            'GET': {
                 'responses': responses.GET,
                 'storage': self.storage_app.get,
             },
