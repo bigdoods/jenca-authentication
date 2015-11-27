@@ -227,10 +227,10 @@ def signup():
                 email=email),
         ), codes.CONFLICT
 
-
     data = {
         'email': email,
-        'password_hash': bcrypt.generate_password_hash(password).decode('utf8'),
+        'password_hash': bcrypt.generate_password_hash(password).decode(
+            'utf8'),
     }
 
     requests.post(

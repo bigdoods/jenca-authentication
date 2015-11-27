@@ -97,6 +97,7 @@ class AuthenticationTests(DatabaseTestCase):
             {key: value for (key, value) in response.headers},
             response.data)
 
+
 class SignupTests(AuthenticationTests):
     """
     Tests for the user sign up endpoint at ``/signup``.
