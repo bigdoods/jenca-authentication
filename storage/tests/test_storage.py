@@ -3,8 +3,6 @@ Tests for storage service.
 """
 
 # TODO tests for getting all users
-# TODO update the docs
-# TODO Put the docs for this API in the docs
 
 import json
 import unittest
