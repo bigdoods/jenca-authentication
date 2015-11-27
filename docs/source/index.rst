@@ -19,6 +19,8 @@ Example Use
 .. TODO: Get Travis to run this
 .. TODO support different docker hosts, probably with a test setup
 
+.. doctest::
+
    >>> import subprocess
    >>> import json
    >>> import requests
@@ -28,11 +30,21 @@ Example Use
    0
    >>> docker_ip = subprocess.check_output(['docker-machine', 'ip', 'dev']).strip()
    >>> authentication_url = 'http://' + docker_ip.decode('utf8') + ':5000'
-   >>> url = authentication_url + '/signup'
+   >>> signup_url = authentication_url + '/signup'
    >>> headers = {'Content-Type': 'application/json'}
    >>> data = {"email": "jenca@example.com", "password": "secret"}
-   >>> requests.post(url=url, headers=headers, data=json.dumps(data))
-   <Response[201]>
+   >>> response = requests.post(url=signup_url, headers=headers, data=json.dumps(data))
+   >>> response
+   <Response [201]>
+   >>> json.loads(response.text)
+   {'email': 'jenca@example.com', 'password': 'secret'}
+   >>> status_url = authentication_url + '/status'
+   >>> status = requests.get(url=status_url, headers=headers)
+   >>> status
+   <Response [200]>
+   >>> json.loads(status.text)
+   {'is_authenticated': False}
+   >>> import pdb; pdb.set_trace()
 
 .. testcleanup::
 
