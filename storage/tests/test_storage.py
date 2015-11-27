@@ -215,8 +215,8 @@ class DeleteUserTests(InMemoryStorageTests):
     def test_delete_user(self):
         """
         A ``DELETE`` request to delete a user returns an OK status code and the
-        email of the deleted user. The user is no longer available when getting
-        the list of users.
+        details of the deleted user. The user is no longer available when
+        getting the list of users.
         """
         self.storage_app.post(
             '/users',

@@ -91,8 +91,8 @@ def specific_user_route(email):
 
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
-    :resjson string email: The email address of the new user.
-    :resjson string password_hash: The password hash of the new user.
+    :resjson string email: The email address of the deleted user.
+    :resjson string password_hash: The password hash of the deleted user.
     :status 200: The user has been deleted.
     :status 404: There is no user with the given ``email``.
 
