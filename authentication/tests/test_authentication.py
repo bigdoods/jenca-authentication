@@ -47,40 +47,48 @@ class AuthenticationTests(InMemoryStorageTests):
 
         self.app = app.test_client()
 
+        self.method_map = {
+            'POST': {
+                'responses': responses.POST,
+                'storage': self.storage_app.post,
+            },
+            'GET': {
+                'responses': responses.GET,
+                'storage': self.storage_app.get,
+            },
+            'DELETE': {
+                'responses': responses.DELETE,
+                'storage': self.storage_app.delete,
+            },
+            'OPTIONS': {
+                'responses': responses.OPTIONS,
+                'storage': self.storage_app.options,
+            },
+            'HEAD': {
+                'responses': responses.HEAD,
+                'storage': self.storage_app.head,
+            },
+        }
+
         for rule in self.storage_url_map.iter_rules():
             if rule.endpoint == 'static':
                 continue
 
-            for method in rule.methods:
-                if method == 'POST':
-                    responses.add_callback(
-                        responses.POST,
-                        urljoin(STORAGE_URL, rule.rule),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-                elif method == 'GET':
-                    # We assume here that everything is in the style:
-                    # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
-                    # not necessarily the case.
-                    pattern = urljoin(
-                        STORAGE_URL,
-                        re.sub(pattern='<.+>', repl='.+', string=rule.rule),
-                    )
+            # We assume here that everything is in the style:
+            # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
+            # not necessarily the case.
+            pattern = urljoin(
+                STORAGE_URL,
+                re.sub(pattern='<.+>', repl='.+', string=rule.rule),
+            )
 
-                    responses.add_callback(
-                        responses.GET, re.compile(pattern),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-                elif method in ('OPTIONS', 'HEAD'):
-                    # There is currently no need to support fake "OPTIONS"
-                    # or "HEAD" requests
-                    pass
-                else:  # pragma: no cover
-                    # Sometimes all methods are implemented, but this is still
-                    # useful, so do not count it as missing coverage.
-                    raise NotImplementedError()
+            for method in rule.methods:
+                responses.add_callback(
+                    self.method_map[method]['responses'],
+                    re.compile(pattern),
+                    callback=self.request_callback,
+                    content_type='application/json',
+                )
 
     def request_callback(self, request):
         """
@@ -88,15 +96,10 @@ class AuthenticationTests(InMemoryStorageTests):
         an in memory fake of the storage service and return some key details
         of the response.
         """
-        if request.method == 'POST':
-            response = self.storage_app.post(
-                request.path_url,
-                content_type=request.headers['Content-Type'],
-                data=request.body)
-        elif request.method == 'GET':
-            response = self.storage_app.get(
-                request.path_url,
-                content_type=request.headers['Content-Type'])
+        response = self.method_map[request.method]['storage'](
+            request.path_url,
+            content_type=request.headers['Content-Type'],
+            data=request.body)
 
         return (
             response.status_code,
