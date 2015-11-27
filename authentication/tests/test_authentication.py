@@ -95,6 +95,10 @@ class AuthenticationTests(InMemoryStorageTests):
         Given a request to the storage service, send an equivalent request to
         an in memory fake of the storage service and return some key details
         of the response.
+
+        :param request: The incoming request to pass onto the storage app.
+        :return: A tuple of status code, response headers and response data
+            from the storage app.
         """
         response = self.method_map[request.method]['storage'](
             request.path_url,
