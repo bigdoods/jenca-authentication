@@ -90,6 +90,11 @@ class AuthenticationTests(InMemoryStorageTests):
             response = self.storage_app.get(
                 request.path_url,
                 content_type=request.headers['Content-Type'])
+        elif request.method == 'DELETE':
+            response = self.storage_app.delete(
+                request.path_url,
+                content_type=request.headers['Content-Type'],
+            )
 
         return (
             response.status_code,
@@ -456,6 +461,7 @@ class DeleteUserTests(AuthenticationTests):
     Tests for the delete user endpoint at ``DELETE /users/<email>``.
     """
 
+    @responses.activate
     def test_delete_user(self):
         """
         A ``DELETE`` request to delete a user returns an OK status code and the
@@ -469,10 +475,14 @@ class DeleteUserTests(AuthenticationTests):
         response = self.app.delete(
             '/users/{email}'.format(email=USER_DATA['email']),
             content_type='application/json')
+
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.OK)
-        self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
-        self.assertIsNone(load_user_from_id(user=USER_DATA['email']))
+        self.assertEqual(
+            json.loads(response.data.decode('utf8')),
+            {'email': USER_DATA['email']})
+
+        self.assertIsNone(load_user_from_id(user_id=USER_DATA['email']))
 
     def test_non_existant_user(self):
         """

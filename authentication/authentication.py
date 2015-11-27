@@ -231,7 +231,7 @@ def specific_user_route(email):
         headers={'Content-Type': 'application/json'},
     )
 
-    return_data = jsonify(email=user.email, password_hash=user.password_hash)
+    return_data = jsonify(email=user.email)
     return return_data, codes.OK
 
 
