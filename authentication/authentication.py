@@ -247,6 +247,14 @@ def signup():
 
     return jsonify(email=email, password=password), codes.CREATED
 
+@app.route('/status', methods=['GET'])
+@consumes('application/json')
+def status():
+    """
+    TODO
+    """
+    pass
+
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on
     # all public IPs. This makes the server visible externally.
