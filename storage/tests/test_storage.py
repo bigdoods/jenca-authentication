@@ -171,7 +171,7 @@ class GetUsersTests(InMemoryStorageTests):
 
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.OK)
-        self.assertEqual(json.loads(response.data.decode('utf8')), {})
+        self.assertEqual(json.loads(response.data.decode('utf8')), [])
 
     def test_with_users(self):
         """
