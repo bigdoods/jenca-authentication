@@ -25,6 +25,7 @@ storage:
    # HOST:CONTAINER
 
    # Flask defaults to listening on port 5000 but this is configurable.
+   # The storage service is configured to serve on 5001.
    # See http://flask.pocoo.org/docs/0.10/api/#flask.Flask.run
    - "5001:5001"
   volumes:
