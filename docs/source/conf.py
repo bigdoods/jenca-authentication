@@ -24,6 +24,7 @@ sys.path.insert(0, os.path.abspath('../..'))
 extensions = [
     'sphinxcontrib.autohttp.flask',
     'sphinxcontrib.spelling',
+    'sphinx.ext.doctest',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
