@@ -2,8 +2,6 @@
 Tests for the storage service.
 """
 
-# TODO tests for getting all users
-
 import json
 
 from requests import codes
