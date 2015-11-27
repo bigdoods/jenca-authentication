@@ -1,38 +1,19 @@
 """
-Tests for storage service.
+Tests for the storage service.
 """
 
 # TODO tests for getting all users
 
 import json
-import unittest
 
 from flask.ext.sqlalchemy import orm
 from requests import codes
 
 from storage.storage import app as storage_app, db, User
 
+from .testtools import DatabaseTestCase
+
 USER_DATA = {'email': 'alice@example.com', 'password_hash': '123abc'}
-
-
-class DatabaseTestCase(unittest.TestCase):
-    """
-    Set up and tear down an application with an in memory database for testing.
-    """
-
-    def setUp(self):
-        storage_app.config['TESTING'] = True
-        storage_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        self.storage_app = storage_app.test_client()
-        self.storage_url_map = storage_app.url_map
-
-        with storage_app.app_context():
-            db.create_all()
-
-    def tearDown(self):
-        with storage_app.app_context():
-            db.session.remove()
-            db.drop_all()
 
 
 class CreateUserTests(DatabaseTestCase):

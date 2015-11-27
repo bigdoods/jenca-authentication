@@ -25,8 +25,7 @@ from authentication.authentication import (
     User,
 )
 
-# TODO move this to testtools
-from storage.tests.test_storage import DatabaseTestCase
+from storage.tests.testtools import DatabaseTestCase
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
