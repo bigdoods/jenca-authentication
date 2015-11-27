@@ -20,7 +20,6 @@ from flask.ext.login import (
     make_secure_token,
     UserMixin,
 )
-
 from flask_jsonschema import JsonSchema, ValidationError
 from flask_negotiate import consumes
 
