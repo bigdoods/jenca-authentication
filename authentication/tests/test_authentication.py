@@ -75,7 +75,6 @@ class AuthenticationTests(InMemoryStorageTests):
                     content_type='application/json',
                 )
 
-
     def request_callback(self, request):
         """
         Given a request to the storage service, send an equivalent request to
@@ -452,11 +451,58 @@ class LoadUserFromTokenTests(AuthenticationTests):
         self.assertIsNone(load_user_from_token(auth_token='fake_token'))
 
 
-class DeleteUserTests(InMemoryStorageTests):
+class DeleteUserTests(AuthenticationTests):
     """
     Tests for the delete user endpoint at ``DELETE /users/<email>``.
     """
-    pass
+
+    def test_delete_user(self):
+        """
+        A ``DELETE`` request to delete a user returns an OK status code and the
+        email of the deleted user. The user no longer exists.
+        """
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+
+        response = self.app.delete(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='application/json')
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.OK)
+        self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
+        self.assertIsNone(load_user_from_id(user=USER_DATA['email']))
+
+    def test_non_existant_user(self):
+        """
+        A ``DELETE`` request for a user which does not exist returns a
+        NOT_FOUND status code and error details.
+        """
+        response = self.app.delete(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='application/json')
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.NOT_FOUND)
+        expected = {
+            'title': 'The requested user does not exist.',
+            'detail': 'No user exists with the email "{email}"'.format(
+                email=USER_DATA['email']),
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.delete(
+            '/users/{email}'.format(email=USER_DATA['email']),
+            content_type='text/html',
+        )
+
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
+
 
 class UserTests(unittest.TestCase):
     """
