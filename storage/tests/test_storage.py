@@ -152,3 +152,9 @@ class GetUserTests(InMemoryStorageTests):
         )
 
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
+
+
+class GetUsersTests(InMemoryStorageTests):
+    """
+    Tests for getting all users at ``GET /users/``.
+    """
