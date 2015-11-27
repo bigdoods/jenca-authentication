@@ -403,13 +403,13 @@ class LoadUserTests(AuthenticationTests):
             USER_DATA['email'],
         )
 
+    @responses.activate
     def test_user_does_not_exist(self):
         """
         If no user exists with the email given as the user ID to
         ``load_user_from_id``, ``None`` is returned.
         """
-        with app.app_context():
-            self.assertIsNone(load_user_from_id(user_id='email'))
+        self.assertIsNone(load_user_from_id(user_id='email'))
 
 
 class LoadUserFromTokenTests(unittest.TestCase):
