@@ -85,12 +85,25 @@ def on_validation_error(error):
 @consumes('application/json')
 def specific_user_route(email):
     """
-    Get information about particular user.
+    **DELETE**:
+
+    Delete a particular user.
 
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
     :resjson string password_hash: The password hash of the new user.
+    :status 200: The user has been deleted.
+    :status 404: There is no user with the given ``email``.
+
+    **GET**:
+
+    Get information about particular user.
+
+    :reqheader Content-Type: application/json
+    :resheader Content-Type: application/json
+    :resjson string email: The email address of the user.
+    :resjson string password_hash: The password hash of the user.
     :status 200: The requested user's information is returned.
     :status 404: There is no user with the given ``email``.
     """
