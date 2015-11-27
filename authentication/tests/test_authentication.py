@@ -452,6 +452,12 @@ class LoadUserFromTokenTests(AuthenticationTests):
         self.assertIsNone(load_user_from_token(auth_token='fake_token'))
 
 
+class DeleteUserTests(InMemoryStorageTests):
+    """
+    Tests for the delete user endpoint at ``DELETE /users/<email>``.
+    """
+    pass
+
 class UserTests(unittest.TestCase):
     """
     Tests for the ``User`` model.
