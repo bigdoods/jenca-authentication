@@ -132,7 +132,7 @@ def create_user():
 @consumes('application/json')
 def users_route():
     """
-    # TODO figure out separating docs for get and post
+    **POST**:
 
     Create a new user.
 
@@ -148,7 +148,16 @@ def users_route():
     :status 200: A user with the given ``email`` and ``password_hash`` has been
         created.
     :status 409: There already exists a user with the given ``email``.
+
+    **GET**:
+
+    :reqheader Content-Type: application/json
+    :resheader Content-Type: application/json
+    :resjsonarr string email: The email address of a user.
+    :resjsonarr string password_hash: The password hash of a user.
+    :status 200: Information about all users is returned.
     """
+
     if request.method == 'POST':
         return create_user()
     elif request.method == 'GET':
