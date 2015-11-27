@@ -228,10 +228,7 @@ class DeleteUserTests(InMemoryStorageTests):
             content_type='application/json')
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.OK)
-        expected = {
-            'email': USER_DATA['email'],
-        }
-        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+        self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
 
         users = self.storage_app.get(
             '/users',

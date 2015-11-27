@@ -83,7 +83,7 @@ def on_validation_error(error):
 
 @app.route('/users/<email>', methods=['GET', 'DELETE'])
 @consumes('application/json')
-def get_user(email):
+def specific_user_route(email):
     """
     Get information about particular user.
 
@@ -102,6 +102,10 @@ def get_user(email):
             detail='No user exists with the email "{email}"'.format(
                 email=email),
         ), codes.NOT_FOUND
+
+    elif request.method == 'DELETE':
+        db.session.delete(user)
+        db.session.commit()
 
     return_data = jsonify(email=user.email, password_hash=user.password_hash)
     return return_data, codes.OK
