@@ -117,8 +117,10 @@ def load_user_from_token(auth_token):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    # TODO set content type
-    response = requests.get(urljoin(STORAGE_URL, '/users'))
+    response = requests.get(
+        urljoin(STORAGE_URL, '/users'),
+        headers={'Content-Type': 'application/json'},
+    )
 
     for details in json.loads(response.data):
         user = User(
