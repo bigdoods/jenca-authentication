@@ -89,10 +89,8 @@ def load_user_from_id(user_id):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    response = requests.get(
-        urljoin(STORAGE_URL, 'users/{email}').format(email=user_id),
-        headers={'Content-Type': 'application/json'},
-    )
+    url = urljoin(STORAGE_URL, 'users/{email}').format(email=user_id)
+    response = requests.get(url, headers={'Content-Type': 'application/json'})
 
     if response.status_code == codes.OK:
         details = json.loads(response.text)
