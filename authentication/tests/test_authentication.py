@@ -31,13 +31,14 @@ from storage.tests.test_storage import DatabaseTestCase
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
-class SignupTests(DatabaseTestCase):
+class AuthenticationTests(DatabaseTestCase):
     """
-    Tests for the user sign up endpoint at ``/signup``.
+    Connect to an in memory fake of the storage service and create a verified
+    fake for ``requests`` to connect to.
     """
 
     def setUp(self):
-        super(SignupTests, self).setUp()
+        super(AuthenticationTests, self).setUp()
         self.app = app.test_client()
 
         for rule in self.storage_url_map.iter_rules():
@@ -93,6 +94,11 @@ class SignupTests(DatabaseTestCase):
             response.status_code,
             {key: value for (key, value) in response.headers},
             response.data)
+
+class SignupTests(AuthenticationTests):
+    """
+    Tests for the user sign up endpoint at ``/signup``.
+    """
 
     @responses.activate
     def test_signup(self):
@@ -189,14 +195,12 @@ class SignupTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LoginTests(unittest.TestCase):
+class LoginTests(AuthenticationTests):
     """
     Tests for the user log in endpoint at ``/login``.
     """
 
-    def setUp(self):
-        self.app = app.test_client()
-
+    @responses.activate
     def test_login(self):
         """
         Logging in as a user which has been signed up returns an OK status
@@ -212,6 +216,7 @@ class LoginTests(unittest.TestCase):
             data=json.dumps(USER_DATA))
         self.assertEqual(response.status_code, codes.OK)
 
+    @responses.activate
     def test_non_existant_user(self):
         """
         Attempting to log in as a user which has been not been signed up
@@ -230,6 +235,7 @@ class LoginTests(unittest.TestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
+    @responses.activate
     def test_wrong_password(self):
         """
         Attempting to log in with an incorrect password returns an UNAUTHORIZED
@@ -254,6 +260,7 @@ class LoginTests(unittest.TestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
+    @responses.activate
     def test_remember_me_cookie_set(self):
         """
         A "Remember Me" token is in the response header of a successful login
