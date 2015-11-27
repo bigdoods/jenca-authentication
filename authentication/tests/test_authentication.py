@@ -36,6 +36,12 @@ class SignupTests(DatabaseTestCase):
         super(SignupTests, self).setUp()
         self.app = app.test_client()
 
+        responses.add_callback(
+            responses.POST, 'http://storage:5001/users',
+            callback=self.request_callback,
+            content_type='application/json',
+        )
+
     def request_callback(self, request):
         # TODO different things for post, get
         response = self.storage_app.post(
@@ -54,12 +60,6 @@ class SignupTests(DatabaseTestCase):
         A signup ``POST`` request with an email address and password returns a
         JSON response with user credentials and a CREATED status.
         """
-        responses.add_callback(
-            responses.POST, 'http://storage:5001/users',
-            callback=self.request_callback,
-            content_type='application/json',
-        )
-
         response = self.app.post(
             '/signup',
             content_type='application/json',
