@@ -251,4 +251,4 @@ if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on
     # all public IPs. This makes the server visible externally.
     # See http://flask.pocoo.org/docs/0.10/quickstart/#a-minimal-application
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0')
