@@ -37,6 +37,10 @@ class AuthenticationTests(InMemoryStorageTests):
     """
 
     def setUp(self):
+        """
+        Create an environment with a fake storage app available and mocked for
+        ``requests``.
+        """
         # This sets up variables to use as a fake storage service.
         super(AuthenticationTests, self).setUp()
 
