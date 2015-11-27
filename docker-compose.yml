@@ -1,6 +1,3 @@
-# TODO debug environment variable. set debug=true but also make sure that
-# environment variables are set if in prod.
-
 authenticate:
   build: .
   ports:
