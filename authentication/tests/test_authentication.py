@@ -459,31 +459,6 @@ class LoadUserFromTokenTests(AuthenticationTests):
         """
         self.assertIsNone(load_user_from_token(auth_token='fake_token'))
 
-    @responses.activate
-    @unittest.expectedFailure
-    def test_modified_password(self):
-        """
-        If a user's password (hash) is modified, their token is no longer
-        valid.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-
-        cookies = response.headers.getlist('Set-Cookie')
-
-        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
-        headers_dict = {key: value for key, value in items}
-        token = headers_dict['remember_token']
-        user = load_user_from_id(user_id=USER_DATA['email'])
-        user.password_hash = 'new_hash'
-        self.assertIsNone(load_user_from_token(auth_token=token))
-
 
 class UserTests(unittest.TestCase):
     """
