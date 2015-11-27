@@ -29,6 +29,7 @@ class DatabaseTestCase(unittest.TestCase):
         storage_app.config['TESTING'] = True
         storage_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         self.storage_app = storage_app.test_client()
+        self.storage_url_map = storage_app.url_map
 
         with storage_app.app_context():
             db.create_all()
