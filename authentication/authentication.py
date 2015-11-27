@@ -253,7 +253,14 @@ def signup():
 @consumes('application/json')
 def status():
     """
-    TODO
+    Get information about the current activated user.
+
+    :reqheader Content-Type: application/json
+    :resheader Content-Type: application/json
+    :resjson bool is_authenticated: There is a current authenticated user.
+    :resjson string email: The email address of the current user. This is only
+        given if there is a current authenticated user.
+    :status 200:
     """
     if current_user.is_authenticated:
         return jsonify(is_authenticated=True, email=current_user.email)
