@@ -8,12 +8,12 @@ import json
 
 from requests import codes
 
-from .testtools import DatabaseTestCase
+from .testtools import InMemoryStorageTests
 
 USER_DATA = {'email': 'alice@example.com', 'password_hash': '123abc'}
 
 
-class CreateUserTests(DatabaseTestCase):
+class CreateUserTests(InMemoryStorageTests):
     """
     Tests for the user creation endpoint at ``POST /users``.
     """
@@ -104,7 +104,7 @@ class CreateUserTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class GetUserTests(DatabaseTestCase):
+class GetUserTests(InMemoryStorageTests):
     """
     Tests for getting a user at ``GET /users/{email}``.
     """

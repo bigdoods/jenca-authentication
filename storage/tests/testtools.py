@@ -7,7 +7,7 @@ import unittest
 from storage.storage import app as storage_app, db
 
 
-class DatabaseTestCase(unittest.TestCase):
+class InMemoryStorageTests(unittest.TestCase):
     """
     Set up and tear down an application with an in memory database for testing.
     """

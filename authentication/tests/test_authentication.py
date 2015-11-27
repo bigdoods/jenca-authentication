@@ -25,12 +25,12 @@ from authentication.authentication import (
     User,
 )
 
-from storage.tests.testtools import DatabaseTestCase
+from storage.tests.testtools import InMemoryStorageTests
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
-class AuthenticationTests(DatabaseTestCase):
+class AuthenticationTests(InMemoryStorageTests):
     """
     Connect to an in memory fake of the storage service and create a verified
     fake for ``requests`` to connect to.
