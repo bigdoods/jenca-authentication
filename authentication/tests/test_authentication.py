@@ -3,9 +3,14 @@ Tests for authentication.authentication.
 """
 
 import json
-import os
 import re
 import unittest
+
+# This is necessary because urljoin moved between Python 2 and Python 3
+from future.standard_library import install_aliases
+install_aliases()
+
+from urllib.parse import urljoin
 
 from flask.ext.login import make_secure_token
 from requests import codes
@@ -44,7 +49,7 @@ class SignupTests(DatabaseTestCase):
                     # do something
                     responses.add_callback(
                         responses.POST,
-                        os.path.join('http://storage:5001', rule.rule),
+                        urljoin('http://storage:5001', rule.rule),
                         callback=self.request_callback,
                         content_type='application/json',
                     )
@@ -63,7 +68,6 @@ class SignupTests(DatabaseTestCase):
             callback=self.request_callback,
             content_type='application/json',
         )
-
 
     def request_callback(self, request):
         """
