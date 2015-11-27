@@ -53,11 +53,7 @@ class User(UserMixin):
 
 
 app = Flask(__name__)
-app.config['SESSION_TYPE'] = 'memcached'
-
-# TODO use environment variables for these
-app.secret_key = 'secret'
-app.config['SECRET_KEY'] = 'secret'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret')
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)

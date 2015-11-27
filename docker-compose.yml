@@ -11,7 +11,8 @@ authenticate:
    - .:/code
   environment:
    - SQLALCHEMY_DATABASE_URI=sqlite:////data/authentication.db
-   - SECRET
+   # In production use the host environment variable instead of 'secret'
+   - SECRET_KEY=secret
   command: python authentication/authentication.py
   links:
     - storage
