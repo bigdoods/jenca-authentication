@@ -3,49 +3,113 @@ Tests for authentication.authentication.
 """
 
 import json
+import re
 import unittest
 
+# This is necessary because urljoin moved between Python 2 and Python 3
+from future.standard_library import install_aliases
+install_aliases()
+
+from urllib.parse import urljoin
+
 from flask.ext.login import make_secure_token
-from flask.ext.sqlalchemy import orm
 from requests import codes
+import responses
 from werkzeug.http import parse_cookie
 
 from authentication.authentication import (
     app,
     bcrypt,
-    db,
     load_user_from_id,
     load_user_from_token,
     User,
+    STORAGE_URL,
 )
+
+from storage.tests.testtools import InMemoryStorageTests
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
-class DatabaseTestCase(unittest.TestCase):
+class AuthenticationTests(InMemoryStorageTests):
     """
-    Set up and tear down an application with an in memory database for testing.
+    Connect to an in memory fake of the storage service and create a verified
+    fake for ``requests`` to connect to.
     """
 
     def setUp(self):
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+        """
+        Create an environment with a fake storage app available and mocked for
+        ``requests``.
+        """
+        # This sets up variables to use as a fake storage service.
+        super(AuthenticationTests, self).setUp()
+
         self.app = app.test_client()
 
-        with app.app_context():
-            db.create_all()
+        for rule in self.storage_url_map.iter_rules():
+            if rule.endpoint == 'static':
+                continue
 
-    def tearDown(self):
-        with app.app_context():
-            db.session.remove()
-            db.drop_all()
+            for method in rule.methods:
+                if method == 'POST':
+                    responses.add_callback(
+                        responses.POST,
+                        urljoin(STORAGE_URL, rule.rule),
+                        callback=self.request_callback,
+                        content_type='application/json',
+                    )
+                elif method == 'GET':
+                    # We assume here that everything is in the style:
+                    # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
+                    # not necessarily the case.
+                    pattern = urljoin(
+                        STORAGE_URL,
+                        re.sub(pattern='<.+>', repl='.+', string=rule.rule),
+                    )
+
+                    responses.add_callback(
+                        responses.GET, re.compile(pattern),
+                        callback=self.request_callback,
+                        content_type='application/json',
+                    )
+                elif method in ('OPTIONS', 'HEAD'):
+                    # There is currently no need to support fake "OPTIONS"
+                    # or "HEAD" requests
+                    pass
+                else:  # pragma: no cover
+                    # Sometimes all methods are implemented, but this is still
+                    # useful, so do not count it as missing coverage.
+                    raise NotImplementedError()
+
+    def request_callback(self, request):
+        """
+        Given a request to the storage service, send an equivalent request to
+        an in memory fake of the storage service and return some key details
+        of the response.
+        """
+        if request.method == 'POST':
+            response = self.storage_app.post(
+                request.path_url,
+                content_type=request.headers['Content-Type'],
+                data=request.body)
+        elif request.method == 'GET':
+            response = self.storage_app.get(
+                request.path_url,
+                content_type=request.headers['Content-Type'])
+
+        return (
+            response.status_code,
+            {key: value for (key, value) in response.headers},
+            response.data)
 
 
-class SignupTests(DatabaseTestCase):
+class SignupTests(AuthenticationTests):
     """
     Tests for the user sign up endpoint at ``/signup``.
     """
 
+    @responses.activate
     def test_signup(self):
         """
         A signup ``POST`` request with an email address and password returns a
@@ -59,6 +123,7 @@ class SignupTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.CREATED)
         self.assertEqual(json.loads(response.data.decode('utf8')), USER_DATA)
 
+    @responses.activate
     def test_passwords_hashed(self):
         """
         Passwords are hashed before being saved to the database.
@@ -67,8 +132,7 @@ class SignupTests(DatabaseTestCase):
             '/signup',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        with app.app_context():
-            user = User.query.filter_by(email=USER_DATA['email']).first()
+        user = load_user_from_id(user_id=USER_DATA['email'])
         self.assertTrue(bcrypt.check_password_hash(user.password_hash,
                                                    USER_DATA['password']))
 
@@ -106,6 +170,7 @@ class SignupTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
+    @responses.activate
     def test_existing_user(self):
         """
         A signup request for an email address which already exists returns a
@@ -139,11 +204,12 @@ class SignupTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LoginTests(DatabaseTestCase):
+class LoginTests(AuthenticationTests):
     """
     Tests for the user log in endpoint at ``/login``.
     """
 
+    @responses.activate
     def test_login(self):
         """
         Logging in as a user which has been signed up returns an OK status
@@ -159,6 +225,7 @@ class LoginTests(DatabaseTestCase):
             data=json.dumps(USER_DATA))
         self.assertEqual(response.status_code, codes.OK)
 
+    @responses.activate
     def test_non_existant_user(self):
         """
         Attempting to log in as a user which has been not been signed up
@@ -177,6 +244,7 @@ class LoginTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
+    @responses.activate
     def test_wrong_password(self):
         """
         Attempting to log in with an incorrect password returns an UNAUTHORIZED
@@ -201,6 +269,7 @@ class LoginTests(DatabaseTestCase):
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
+    @responses.activate
     def test_remember_me_cookie_set(self):
         """
         A "Remember Me" token is in the response header of a successful login
@@ -266,11 +335,12 @@ class LoginTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LogoutTests(DatabaseTestCase):
+class LogoutTests(AuthenticationTests):
     """
     Tests for the user log out endpoint at ``/logout``.
     """
 
+    @responses.activate
     def test_logout(self):
         """
         A POST request to log out when a user is logged in returns an OK status
@@ -321,12 +391,13 @@ class LogoutTests(DatabaseTestCase):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LoadUserTests(DatabaseTestCase):
+class LoadUserTests(AuthenticationTests):
     """
     Tests for ``load_user_from_id``, which is a function required by
     Flask-Login.
     """
 
+    @responses.activate
     def test_user_exists(self):
         """
         If a user exists with the email given as the user ID to
@@ -336,25 +407,27 @@ class LoadUserTests(DatabaseTestCase):
             '/signup',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        with app.app_context():
-            self.assertEqual(load_user_from_id(user_id=USER_DATA['email']),
-                             User(email=USER_DATA['email']))
+        self.assertEqual(
+            load_user_from_id(user_id=USER_DATA['email']).email,
+            USER_DATA['email'],
+        )
 
+    @responses.activate
     def test_user_does_not_exist(self):
         """
         If no user exists with the email given as the user ID to
         ``load_user_from_id``, ``None`` is returned.
         """
-        with app.app_context():
-            self.assertIsNone(load_user_from_id(user_id='email'))
+        self.assertIsNone(load_user_from_id(user_id='email'))
 
 
-class LoadUserFromTokenTests(DatabaseTestCase):
+class LoadUserFromTokenTests(AuthenticationTests):
     """
     Tests for ``load_user_from_token``, which is a function required by
     Flask-Login when using secure "Alternative Tokens".
     """
 
+    @responses.activate
     def test_load_user_from_token(self):
         """
         A user is loaded if their token is provided to
@@ -377,39 +450,15 @@ class LoadUserFromTokenTests(DatabaseTestCase):
             user = load_user_from_id(user_id=USER_DATA['email'])
             self.assertEqual(load_user_from_token(auth_token=token), user)
 
+    @responses.activate
     def test_fake_token(self):
         """
         If a token does not belong to a user, ``None`` is returned.
         """
-        with app.app_context():
-            self.assertIsNone(load_user_from_token(auth_token='fake_token'))
-
-    def test_modified_password(self):
-        """
-        If a user's password (hash) is modified, their token is no longer
-        valid.
-        """
-        self.app.post(
-            '/signup',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-        response = self.app.post(
-            '/login',
-            content_type='application/json',
-            data=json.dumps(USER_DATA))
-
-        cookies = response.headers.getlist('Set-Cookie')
-
-        items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
-        headers_dict = {key: value for key, value in items}
-        token = headers_dict['remember_token']
-        with app.app_context():
-            user = load_user_from_id(user_id=USER_DATA['email'])
-            user.password_hash = 'new_hash'
-            self.assertIsNone(load_user_from_token(auth_token=token))
+        self.assertIsNone(load_user_from_token(auth_token='fake_token'))
 
 
-class UserTests(DatabaseTestCase):
+class UserTests(unittest.TestCase):
     """
     Tests for the ``User`` model.
     """
@@ -421,19 +470,6 @@ class UserTests(DatabaseTestCase):
         """
         user = User(email='email', password_hash='password_hash')
         self.assertEqual(user.get_id(), 'email')
-
-    def test_email_unique(self):
-        """
-        There cannot be two users with the same email address.
-        """
-        user_1 = User(email='email', password_hash='password_hash')
-        user_2 = User(email='email', password_hash='different_hash')
-        with app.app_context():
-            db.session.add(user_1)
-            db.session.commit()
-            db.session.add(user_2)
-            with self.assertRaises(orm.exc.FlushError):
-                db.session.commit()
 
     def test_get_auth_token(self):
         """

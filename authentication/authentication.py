@@ -4,7 +4,13 @@ An authentication service for use in a Jenca Cloud.
 
 import os
 
-from flask import Flask, jsonify, request
+# This is necessary because urljoin moved between Python 2 and Python 3
+from future.standard_library import install_aliases
+install_aliases()
+
+from urllib.parse import urljoin
+
+from flask import Flask, jsonify, request, json
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import (
     LoginManager,
@@ -14,21 +20,21 @@ from flask.ext.login import (
     make_secure_token,
     UserMixin,
 )
-from flask.ext.sqlalchemy import SQLAlchemy
 from flask_jsonschema import JsonSchema, ValidationError
 from flask_negotiate import consumes
 
+import requests
 from requests import codes
 
-db = SQLAlchemy()
 
+class User(UserMixin):
+    """
+    A user has an email address and a password hash.
+    """
 
-class User(db.Model, UserMixin):
-    """
-    A user has an email and password.
-    """
-    email = db.Column(db.String, primary_key=True)
-    password_hash = db.Column(db.String)
+    def __init__(self, email, password_hash):
+        self.email = email
+        self.password_hash = password_hash
 
     def get_auth_token(self):
         """
@@ -51,29 +57,8 @@ class User(db.Model, UserMixin):
         return self.email
 
 
-def create_app(database_uri):
-    """
-    Create an application with a database in a given location.
-
-    :param database_uri: The location of the database for the application.
-    :type database_uri: string
-    :return: An application instance.
-    :rtype: ``Flask``
-    """
-    app = Flask(__name__)
-    app.config['SQLALCHEMY_DATABASE_URI'] = database_uri
-    app.config['SECRET_KEY'] = os.environ.get('SECRET', 'secret')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-    db.init_app(app)
-
-    with app.app_context():
-        db.create_all()
-
-    return app
-
-SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
-                                         'sqlite:///:memory:')
-app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
+app = Flask(__name__)
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'secret')
 bcrypt = Bcrypt(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -83,6 +68,8 @@ login_manager.init_app(app)
 # See https://github.com/mattupstate/flask-jsonschema for details.
 app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'schemas')
 jsonschema = JsonSchema(app)
+
+STORAGE_URL = 'http://storage:5001'
 
 
 @login_manager.user_loader
@@ -102,7 +89,17 @@ def load_user_from_id(user_id):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    return User.query.filter_by(email=user_id).first()
+    response = requests.get(
+        urljoin(STORAGE_URL, 'users/{email}').format(email=user_id),
+        headers={'Content-Type': 'application/json'},
+    )
+
+    if response.status_code == codes.OK:
+        details = json.loads(response.text)
+        return User(
+            email=details['email'],
+            password_hash=details['password_hash'],
+        )
 
 
 @login_manager.token_loader
@@ -119,7 +116,16 @@ def load_user_from_token(auth_token):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    for user in User.query.all():
+    response = requests.get(
+        urljoin(STORAGE_URL, '/users'),
+        headers={'Content-Type': 'application/json'},
+    )
+
+    for details in json.loads(response.text):
+        user = User(
+            email=details['email'],
+            password_hash=details['password_hash'],
+        )
         if user.get_auth_token() == auth_token:
             return user
 
@@ -227,10 +233,17 @@ def signup():
                 email=email),
         ), codes.CONFLICT
 
-    password_hash = bcrypt.generate_password_hash(password)
-    user = User(email=email, password_hash=password_hash)
-    db.session.add(user)
-    db.session.commit()
+    data = {
+        'email': email,
+        'password_hash': bcrypt.generate_password_hash(password).decode(
+            'utf8'),
+    }
+
+    requests.post(
+        urljoin(STORAGE_URL, '/users'),
+        headers={'Content-Type': 'application/json'},
+        data=json.dumps(data),
+    )
 
     return jsonify(email=email, password=password), codes.CREATED
 

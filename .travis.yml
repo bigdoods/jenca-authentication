@@ -32,8 +32,8 @@ script:
   - if [[ $TRAVIS_PYTHON_VERSION < 3.5 ]]; then sphinx-build -W -b linkcheck -d build/doctrees docs/source build/linkcheck; fi
   # Check spelling in the documentation.
   - sphinx-build -W -b spelling -d build/doctrees docs/source build/spelling
-  # Run all discoverable tests, but set the source directory so that the coverage tool knows not to include coverage for all dependencies.
-  - "coverage run --source=authentication -m unittest discover"
+  # Run all discoverable tests, but set the source directories so that the coverage tool knows not to include coverage for all dependencies.
+  - "coverage run --source=authentication,storage -m unittest discover"
 after_success:
   # Sends the coverage report to coveralls.io which can report to Pull Requests
   # and track test coverage over time.

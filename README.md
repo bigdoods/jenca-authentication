@@ -69,5 +69,5 @@ $ open docs/build/html/index.html
 
 ## TODO
 
-* Better persistence of the database with Docker volumes (maybe a different service or container for persistence).
 * /status endpoint for user status (id of the logged in user, or no logged in user)
+* Some way of setting with Docker a way of describing whether the app should be in development or testing. This will likely be an environment variable. In testing only, share the code with the container as a volume with ".:code", which allows Flask to see code changes. In testing only, set debug mode to true in app.run(), which allows live changes as the code changes. In production make sure that all neccessary environment variables are set.
