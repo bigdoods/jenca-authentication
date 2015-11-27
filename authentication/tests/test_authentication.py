@@ -3,6 +3,7 @@ Tests for authentication.authentication.
 """
 
 import json
+import os
 import re
 import unittest
 
@@ -34,17 +35,35 @@ class SignupTests(DatabaseTestCase):
         super(SignupTests, self).setUp()
         self.app = app.test_client()
 
+        for rule in self.storage_url_map.iter_rules():
+            if rule.endpoint == 'static':
+                continue
+
+            for method in rule.methods:
+                if method == 'POST':
+                    # do something
+                    responses.add_callback(
+                        responses.POST,
+                        os.path.join('http://storage:5001', rule.rule),
+                        callback=self.request_callback,
+                        content_type='application/json',
+                    )
+                elif method == 'GET':
+                    # do something
+                    pass
+                elif method in ('OPTIONS', 'HEAD'):
+                    # There is currently no need to support fake "OPTIONS"
+                    # or "HEAD" requests
+                    pass
+                else:
+                    raise NotImplementedError()
+
         responses.add_callback(
             responses.GET, re.compile('http://storage:5001/users/.+'),
             callback=self.request_callback,
             content_type='application/json',
         )
 
-        responses.add_callback(
-            responses.POST, 'http://storage:5001/users',
-            callback=self.request_callback,
-            content_type='application/json',
-        )
 
     def request_callback(self, request):
         """
