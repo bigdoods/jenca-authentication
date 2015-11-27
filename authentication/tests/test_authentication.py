@@ -412,12 +412,13 @@ class LoadUserTests(AuthenticationTests):
         self.assertIsNone(load_user_from_id(user_id='email'))
 
 
-class LoadUserFromTokenTests(unittest.TestCase):
+class LoadUserFromTokenTests(AuthenticationTests):
     """
     Tests for ``load_user_from_token``, which is a function required by
     Flask-Login when using secure "Alternative Tokens".
     """
 
+    @responses.activate
     def test_load_user_from_token(self):
         """
         A user is loaded if their token is provided to
@@ -440,13 +441,14 @@ class LoadUserFromTokenTests(unittest.TestCase):
             user = load_user_from_id(user_id=USER_DATA['email'])
             self.assertEqual(load_user_from_token(auth_token=token), user)
 
+    @responses.activate
     def test_fake_token(self):
         """
         If a token does not belong to a user, ``None`` is returned.
         """
-        with app.app_context():
-            self.assertIsNone(load_user_from_token(auth_token='fake_token'))
+        self.assertIsNone(load_user_from_token(auth_token='fake_token'))
 
+    @responses.activate
     def test_modified_password(self):
         """
         If a user's password (hash) is modified, their token is no longer
@@ -466,10 +468,9 @@ class LoadUserFromTokenTests(unittest.TestCase):
         items = [list(parse_cookie(cookie).items())[0] for cookie in cookies]
         headers_dict = {key: value for key, value in items}
         token = headers_dict['remember_token']
-        with app.app_context():
-            user = load_user_from_id(user_id=USER_DATA['email'])
-            user.password_hash = 'new_hash'
-            self.assertIsNone(load_user_from_token(auth_token=token))
+        user = load_user_from_id(user_id=USER_DATA['email'])
+        user.password_hash = 'new_hash'
+        self.assertIsNone(load_user_from_token(auth_token=token))
 
 
 class UserTests(unittest.TestCase):
