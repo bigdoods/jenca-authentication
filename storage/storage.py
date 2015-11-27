@@ -81,7 +81,6 @@ def on_validation_error(error):
 
 
 @app.route('/users/<email>', methods=['GET'])
-# TODO test for consumes
 @consumes('application/json')
 def get_user(email):
     """
