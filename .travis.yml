@@ -1,3 +1,5 @@
+# This is necessary to use docker
+sudo: required
 language: python
 python:
   # These versions are semi-arbitrary. We have no need right now for two Python
@@ -5,6 +7,9 @@ python:
   # Python 3)
   - "2.7"
   - "3.5"
+# End-to-end tests use docker
+services:
+  - docker
 addons:
   apt:
     packages:
