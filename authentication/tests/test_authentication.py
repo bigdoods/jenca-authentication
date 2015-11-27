@@ -46,7 +46,6 @@ class SignupTests(DatabaseTestCase):
 
             for method in rule.methods:
                 if method == 'POST':
-                    # do something
                     responses.add_callback(
                         responses.POST,
                         urljoin('http://storage:5001', rule.rule),
@@ -54,20 +53,25 @@ class SignupTests(DatabaseTestCase):
                         content_type='application/json',
                     )
                 elif method == 'GET':
-                    # do something
-                    pass
+                    # We assume here that everything is in the style:
+                    # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
+                    # not necessarily the case.
+                    pattern = urljoin(
+                        'http://storage:5001',
+                        re.sub(pattern='<.+>', repl='.+', string=rule.rule),
+                    )
+
+                    responses.add_callback(
+                        responses.GET, re.compile(pattern),
+                        callback=self.request_callback,
+                        content_type='application/json',
+                    )
                 elif method in ('OPTIONS', 'HEAD'):
                     # There is currently no need to support fake "OPTIONS"
                     # or "HEAD" requests
                     pass
                 else:
                     raise NotImplementedError()
-
-        responses.add_callback(
-            responses.GET, re.compile('http://storage:5001/users/.+'),
-            callback=self.request_callback,
-            content_type='application/json',
-        )
 
     def request_callback(self, request):
         """
