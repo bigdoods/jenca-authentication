@@ -22,6 +22,7 @@ from authentication.authentication import (
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
 
+
 # TODO move this to testtools
 from storage.tests.test_storage import DatabaseTestCase
 
@@ -31,29 +32,31 @@ class SignupTests(DatabaseTestCase):
     Tests for the user sign up endpoint at ``/signup``.
     """
 
+    def setUp(self):
+        super(SignupTests, self).setUp()
+        self.app = app.test_client()
+
+    def request_callback(self, request):
+        # TODO different things for post, get
+        response = self.storage_app.post(
+            request.path_url,
+            content_type=request.headers['Content-Type'],
+            data=request.body)
+
+        return (
+            response.status_code,
+            {key: value for (key, value) in response.headers},
+            response.data)
+
     @responses.activate
     def test_signup(self):
         """
         A signup ``POST`` request with an email address and password returns a
         JSON response with user credentials and a CREATED status.
         """
-
-        self.app = app.test_client()
-
-        def request_callback(request):
-            response = self.storage_app.post(
-                request.path_url,
-                content_type=request.headers['Content-Type'],
-                data=request.body)
-
-            return (
-                response.status_code,
-                {key: value for (key, value) in response.headers},
-                response.data)
-
         responses.add_callback(
             responses.POST, 'http://storage:5001/users',
-            callback=request_callback,
+            callback=self.request_callback,
             content_type='application/json',
         )
 
