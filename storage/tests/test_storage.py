@@ -156,8 +156,20 @@ class GetUserTests(InMemoryStorageTests):
 
 class GetUsersTests(InMemoryStorageTests):
     """
-    Tests for getting all users at ``GET /users/``.
+    Tests for getting information about all users at ``GET /users/``.
     """
+
+    def test_no_users(self):
+        """
+        A ``GET`` request for information about all users returns an OK status
+        code and an empty array when there are no users.
+        """
+
+    def test_with_users(self):
+        """
+        A ``GET`` request for information about all users returns an OK status
+        code and an array of user information.
+        """
 
     def test_incorrect_content_type(self):
         """
