@@ -44,7 +44,8 @@ Example Use
    <Response [200]>
    >>> json.loads(status.text)
    {'is_authenticated': False}
-   >>> import pdb; pdb.set_trace()
+
+.. TODO move this to just after we have "data" set
 
 .. testcleanup::
 
