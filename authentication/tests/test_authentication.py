@@ -428,7 +428,6 @@ class LoadUserFromTokenTests(AuthenticationTests):
     """
 
     @responses.activate
-    @unittest.expectedFailure
     def test_load_user_from_token(self):
         """
         A user is loaded if their token is provided to
@@ -452,7 +451,6 @@ class LoadUserFromTokenTests(AuthenticationTests):
             self.assertEqual(load_user_from_token(auth_token=token), user)
 
     @responses.activate
-    @unittest.expectedFailure
     def test_fake_token(self):
         """
         If a token does not belong to a user, ``None`` is returned.
