@@ -165,7 +165,7 @@ class GetUsersTests(InMemoryStorageTests):
         code and an empty array when there are no users.
         """
         response = self.storage_app.get(
-            '/users/',
+            '/users',
             content_type='application/json',
         )
 
@@ -192,7 +192,7 @@ class GetUsersTests(InMemoryStorageTests):
                 data=json.dumps(user))
 
         response = self.storage_app.get(
-            '/users/',
+            '/users',
             content_type='application/json',
         )
 
@@ -205,5 +205,5 @@ class GetUsersTests(InMemoryStorageTests):
         If a Content-Type header other than 'application/json' is given, an
         UNSUPPORTED_MEDIA_TYPE status code is given.
         """
-        response = self.storage_app.get('/users/', content_type='text/html')
+        response = self.storage_app.get('/users', content_type='text/html')
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)

@@ -4,7 +4,7 @@ An storage service for use by a Jenca Cloud authentication service.
 
 import os
 
-from flask import Flask, jsonify, request
+from flask import Flask, json, jsonify, request, make_response
 
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_jsonschema import JsonSchema, ValidationError
@@ -86,6 +86,8 @@ def get_user(email):
     """
     Get information about particular user.
 
+    # TODO document response
+
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
@@ -107,11 +109,13 @@ def get_user(email):
     return return_data, codes.OK
 
 
-@app.route('/users', methods=['POST'])
+@app.route('/users', methods=['GET', 'POST'])
 @consumes('application/json')
-@jsonschema.validate('users', 'create')
-def create_user():
+# @jsonschema.validate('users', 'create')
+def users_route():
     """
+    # TODO figure out separating docs for get and post
+
     Create a new user.
 
     :param email: The email address of the new user.
@@ -127,21 +131,31 @@ def create_user():
         created.
     :status 409: There already exists a user with the given ``email``.
     """
-    email = request.json['email']
-    password_hash = request.json['password_hash']
+    if request.method == 'POST':
+        email = request.json['email']
+        password_hash = request.json['password_hash']
 
-    if load_user_from_id(email) is not None:
-        return jsonify(
-            title='There is already a user with the given email address.',
-            detail='A user already exists with the email "{email}"'.format(
-                email=email),
-        ), codes.CONFLICT
+        if load_user_from_id(email) is not None:
+            return jsonify(
+                title='There is already a user with the given email address.',
+                detail='A user already exists with the email "{email}"'.format(
+                    email=email),
+            ), codes.CONFLICT
 
-    user = User(email=email, password_hash=password_hash)
-    db.session.add(user)
-    db.session.commit()
+        user = User(email=email, password_hash=password_hash)
+        db.session.add(user)
+        db.session.commit()
 
-    return jsonify(email=email, password_hash=password_hash), codes.CREATED
+        return jsonify(email=email, password_hash=password_hash), codes.CREATED
+    elif request.method == 'GET':
+        details = [
+            {'email': user.email, 'password_hash': user.password_hash} for user
+            in User.query.all()]
+
+        return make_response(
+            json.dumps(details),
+            codes.OK,
+            {'Content-Type': 'application/json'})
 
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on
