@@ -326,14 +326,12 @@ class LoginTests(AuthenticationTests):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LogoutTests(unittest.TestCase):
+class LogoutTests(AuthenticationTests):
     """
     Tests for the user log out endpoint at ``/logout``.
     """
 
-    def setUp(self):
-        self.app = app.test_client()
-
+    @responses.activate
     def test_logout(self):
         """
         A POST request to log out when a user is logged in returns an OK status
