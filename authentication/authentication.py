@@ -13,6 +13,7 @@ from urllib.parse import urljoin
 from flask import Flask, jsonify, request, json
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import (
+    current_user,
     LoginManager,
     login_required,
     login_user,
@@ -253,7 +254,7 @@ def status():
     """
     TODO
     """
-    pass
+    import pdb; pdb.set_trace()
 
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on
