@@ -73,7 +73,9 @@ class AuthenticationTests(DatabaseTestCase):
                     # There is currently no need to support fake "OPTIONS"
                     # or "HEAD" requests
                     pass
-                else:
+                else:  # pragma: no cover
+                    # Sometimes all methods are implemented, but this is still
+                    # useful, so do not count it as missing coverage.
                     raise NotImplementedError()
 
     def request_callback(self, request):
