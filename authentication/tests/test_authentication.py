@@ -382,12 +382,13 @@ class LogoutTests(AuthenticationTests):
         self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
-class LoadUserTests(unittest.TestCase):
+class LoadUserTests(AuthenticationTests):
     """
     Tests for ``load_user_from_id``, which is a function required by
     Flask-Login.
     """
 
+    @responses.activate
     def test_user_exists(self):
         """
         If a user exists with the email given as the user ID to
@@ -397,9 +398,10 @@ class LoadUserTests(unittest.TestCase):
             '/signup',
             content_type='application/json',
             data=json.dumps(USER_DATA))
-        with app.app_context():
-            self.assertEqual(load_user_from_id(user_id=USER_DATA['email']),
-                             User(email=USER_DATA['email']))
+        self.assertEqual(
+            load_user_from_id(user_id=USER_DATA['email']).email,
+            USER_DATA['email'],
+        )
 
     def test_user_does_not_exist(self):
         """
