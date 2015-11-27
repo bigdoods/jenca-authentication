@@ -23,6 +23,7 @@ from authentication.authentication import (
     load_user_from_id,
     load_user_from_token,
     User,
+    STORAGE_URL,
 )
 
 from storage.tests.testtools import InMemoryStorageTests
@@ -54,7 +55,7 @@ class AuthenticationTests(InMemoryStorageTests):
                 if method == 'POST':
                     responses.add_callback(
                         responses.POST,
-                        urljoin('http://storage:5001', rule.rule),
+                        urljoin(STORAGE_URL, rule.rule),
                         callback=self.request_callback,
                         content_type='application/json',
                     )
@@ -63,7 +64,7 @@ class AuthenticationTests(InMemoryStorageTests):
                     # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
                     # not necessarily the case.
                     pattern = urljoin(
-                        'http://storage:5001',
+                        STORAGE_URL,
                         re.sub(pattern='<.+>', repl='.+', string=rule.rule),
                     )
 
