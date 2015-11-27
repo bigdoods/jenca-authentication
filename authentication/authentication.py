@@ -248,13 +248,16 @@ def signup():
 
     return jsonify(email=email, password=password), codes.CREATED
 
+
 @app.route('/status', methods=['GET'])
 @consumes('application/json')
 def status():
     """
     TODO
     """
-    import pdb; pdb.set_trace()
+    if current_user.is_authenticated:
+        return jsonify(is_authenticated=True, email=current_user.email)
+    return jsonify(is_authenticated=False)
 
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on

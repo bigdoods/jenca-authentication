@@ -445,7 +445,7 @@ class StatusTests(AuthenticationTests):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.OK)
         expected = {
-            'is_active_user': True,
+            'is_authenticated': True,
             'email': USER_DATA['email'],
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
@@ -460,7 +460,7 @@ class StatusTests(AuthenticationTests):
         self.assertEqual(response.headers['Content-Type'], 'application/json')
         self.assertEqual(response.status_code, codes.OK)
         expected = {
-            'is_active_user': False,
+            'is_authenticated': False,
         }
         self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
