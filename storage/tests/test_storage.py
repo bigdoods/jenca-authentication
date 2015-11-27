@@ -158,3 +158,11 @@ class GetUsersTests(InMemoryStorageTests):
     """
     Tests for getting all users at ``GET /users/``.
     """
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.storage_app.get('/users/', content_type='text/html')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
