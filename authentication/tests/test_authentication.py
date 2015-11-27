@@ -38,7 +38,9 @@ class AuthenticationTests(DatabaseTestCase):
     """
 
     def setUp(self):
+        # This sets up variables to use as a fake storage service.
         super(AuthenticationTests, self).setUp()
+
         self.app = app.test_client()
 
         for rule in self.storage_url_map.iter_rules():
