@@ -34,6 +34,10 @@ $ curl -X POST \
   -g '192.168.99.100:5000/login' \
   -d '{"email": "user@example.com","password":"secret"}' \
   --cookie-jar ~/Desktop/my_cookie
+$ curl -X GET \
+  -H "Content-Type: application/json" \
+  -g '192.168.99.100:5000/status' \
+  --cookie-jar ~/Desktop/my_cookie
 $ curl -X POST \
   -H "Content-Type: application/json" \
   -g '192.168.99.100:5000/logout' \
