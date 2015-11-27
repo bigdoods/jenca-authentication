@@ -81,20 +81,18 @@ class AuthenticationTests(InMemoryStorageTests):
         an in memory fake of the storage service and return some key details
         of the response.
         """
-        if request.method == 'POST':
-            response = self.storage_app.post(
-                request.path_url,
-                content_type=request.headers['Content-Type'],
-                data=request.body)
-        elif request.method == 'GET':
-            response = self.storage_app.get(
-                request.path_url,
-                content_type=request.headers['Content-Type'])
-        elif request.method == 'DELETE':
-            response = self.storage_app.delete(
-                request.path_url,
-                content_type=request.headers['Content-Type'],
-            )
+        requests_method_map = {
+            'POST': self.storage_app.post,
+            'GET': self.storage_app.get,
+            'DELETE': self.storage_app.delete,
+            'OPTIONS': self.storage_app.options,
+            'HEAD': self.storage_app.head,
+        }
+
+        response = requests_method_map[request.method](
+            request.path_url,
+            content_type=request.headers['Content-Type'],
+            data=request.body)
 
         return (
             response.status_code,
