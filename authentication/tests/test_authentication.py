@@ -53,6 +53,7 @@ class AuthenticationTests(InMemoryStorageTests):
 
             for method in rule.methods:
                 if method == 'POST':
+                    import pdb; pdb.set_trace()
                     responses.add_callback(
                         responses.POST,
                         urljoin(STORAGE_URL, rule.rule),
