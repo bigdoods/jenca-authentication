@@ -428,15 +428,32 @@ class StatusTests(AuthenticationTests):
 
     def test_user_logged_in(self):
         """
-        A ``GET`` request for information about the logged in user returns an OK status
-        code and an the user's email address if there is a logged in user.
+        A ``GET`` request for information about the logged in user returns an
+        OK status code with a flag that there is an active user and that
+        user's email address if there is a logged in user.
         """
 
     def test_no_user_logged_in(self):
         """
-        A ``GET`` request for information about the logged in user returns an OK status
-        code and no details if there is no logged in user.
+        A ``GET`` request for information about the logged in user returns an
+        OK status code and a flag describing that there is no active user if
+        there is no logged in user.
         """
+        response = self.app.get('/status', content_type='application/json')
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.OK)
+        expected = {
+            'is_active_user': False,
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.get('/status', content_type='text/html')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
 
 
 class LoadUserFromTokenTests(AuthenticationTests):
