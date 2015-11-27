@@ -27,10 +27,6 @@ storage:
    # Flask defaults to listening on port 5000 but this is configurable.
    # See http://flask.pocoo.org/docs/0.10/api/#flask.Flask.run
    - "5001:5001"
-  environment:
-    # TODO use this everywhere in the code
-   - STORAGE_PORT=5001
-  container_name: authentication_storage
   volumes:
    - /tmp/authentication:/data
    # This is used to share the code with the container.
