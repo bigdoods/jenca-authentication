@@ -426,12 +426,29 @@ class StatusTests(AuthenticationTests):
     Tests for the endpoint to get the current user's details.
     """
 
+    @responses.activate
     def test_user_logged_in(self):
         """
         A ``GET`` request for information about the logged in user returns an
         OK status code with a flag that there is an active user and that
         user's email address if there is a logged in user.
         """
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.get('/status', content_type='application/json')
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.OK)
+        expected = {
+            'is_active_user': True,
+            'email': USER_DATA['email'],
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
 
     def test_no_user_logged_in(self):
         """
