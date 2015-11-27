@@ -90,7 +90,7 @@ def get_user(email):
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
     :resjson string email: The email address of the new user.
-    :resjson string password_hash: The password of the new user.
+    :resjson string password_hash: The password hash of the new user.
     :status 200: The requested user's information is returned.
     :status 404: There is no user with the given ``email``.
     """
