@@ -47,53 +47,34 @@ class AuthenticationTests(InMemoryStorageTests):
 
         self.app = app.test_client()
 
+        method_map = {
+            'POST': responses.POST,
+            'GET': responses.GET,
+            'DELETE': responses.DELETE,
+            'OPTIONS': responses.OPTIONS,
+            'HEAD': responses.HEAD,
+        }
+
         for rule in self.storage_url_map.iter_rules():
             if rule.endpoint == 'static':
                 continue
 
+            # We assume here that everything is in the style:
+            # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
+            # not necessarily the case.
+            pattern = urljoin(
+                STORAGE_URL,
+                re.sub(pattern='<.+>', repl='.+', string=rule.rule),
+            )
+
             for method in rule.methods:
-                if method == 'POST':
-                    import pdb; pdb.set_trace()
-                    responses.add_callback(
-                        responses.POST,
-                        urljoin(STORAGE_URL, rule.rule),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-                elif method == 'GET':
-                    # We assume here that everything is in the style:
-                    # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
-                    # not necessarily the case.
-                    pattern = urljoin(
-                        STORAGE_URL,
-                        re.sub(pattern='<.+>', repl='.+', string=rule.rule),
-                    )
+                responses.add_callback(
+                    method_map[method],
+                    re.compile(pattern),
+                    callback=self.request_callback,
+                    content_type='application/json',
+                )
 
-                    responses.add_callback(
-                        responses.GET, re.compile(pattern),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-                elif method == "DELETE":
-                    pattern = urljoin(
-                        STORAGE_URL,
-                        re.sub(pattern='<.+>', repl='.+', string=rule.rule),
-                    )
-
-                    responses.add_callback(
-                        responses.DELETE, re.compile(pattern),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-
-                elif method in ('OPTIONS', 'HEAD'):
-                    # There is currently no need to support fake "OPTIONS"
-                    # or "HEAD" requests
-                    pass
-                else:  # pragma: no cover
-                    # Sometimes all methods are implemented, but this is still
-                    # useful, so do not count it as missing coverage.
-                    raise NotImplementedError()
 
     def request_callback(self, request):
         """
