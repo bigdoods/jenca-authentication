@@ -68,7 +68,7 @@ To run end-to-end tests locally:
 (my_virtualenv)$ make -C docs/ doctest
 ```
 
-
+Travis-CI also runs other checks such as lint checks, spelling checks and link checks.
 
 ### Documentation
 
