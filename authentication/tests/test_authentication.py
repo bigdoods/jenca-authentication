@@ -47,29 +47,6 @@ class AuthenticationTests(InMemoryStorageTests):
 
         self.app = app.test_client()
 
-        self.method_map = {
-            'POST': {
-                'responses': responses.POST,
-                'storage': self.storage_app.post,
-            },
-            'GET': {
-                'responses': responses.GET,
-                'storage': self.storage_app.get,
-            },
-            'DELETE': {
-                'responses': responses.DELETE,
-                'storage': self.storage_app.delete,
-            },
-            'OPTIONS': {
-                'responses': responses.OPTIONS,
-                'storage': self.storage_app.options,
-            },
-            'HEAD': {
-                'responses': responses.HEAD,
-                'storage': self.storage_app.head,
-            },
-        }
-
         for rule in self.storage_url_map.iter_rules():
             if rule.endpoint == 'static':
                 continue
@@ -84,7 +61,7 @@ class AuthenticationTests(InMemoryStorageTests):
 
             for method in rule.methods:
                 responses.add_callback(
-                    self.method_map[method]['responses'],
+                    getattr(responses, method),
                     re.compile(pattern),
                     callback=self.request_callback,
                     content_type='application/json',
@@ -96,7 +73,7 @@ class AuthenticationTests(InMemoryStorageTests):
         an in memory fake of the storage service and return some key details
         of the response.
         """
-        response = self.method_map[request.method]['storage'](
+        response = getattr(self.storage_app, request.method.lower())(
             request.path_url,
             content_type=request.headers['Content-Type'],
             data=request.body)
