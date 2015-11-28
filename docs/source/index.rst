@@ -16,8 +16,11 @@ Storage Service API Endpoints
 Example Use
 ===========
 
-.. TODO: Get Travis to run this
-.. TODO support different docker hosts, probably with a test setup
+It is possible to interact with the authentication service using Python's requests.
+
+First, set a variable for the IP address of the Docker host machine.
+
+..    >>> docker_ip = subprocess.check_output(['docker-machine', 'ip', 'dev']).strip()
 
 .. doctest::
 
@@ -28,7 +31,7 @@ Example Use
    0
    >>> subprocess.check_call(['docker-compose', 'up', '-d'])
    0
-   >>> docker_ip = subprocess.check_output(['docker-machine', 'ip', 'dev']).strip()
+   >>> docker_ip = '127.0.0.1'
    >>> authentication_url = 'http://' + docker_ip.decode('utf8') + ':5000'
    >>> signup_url = authentication_url + '/signup'
    >>> headers = {'Content-Type': 'application/json'}
