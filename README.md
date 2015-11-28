@@ -56,6 +56,19 @@ To start developing quickly, it is recommended that you create a `virtualenv` an
 
 Tests are run on [Travis-CI](https://travis-ci.org/jenca-cloud/jenca-authentication).
 
+To run all unit tests locally:
+
+```
+(my_virtualenv)$ coverage run --source=authentication,storage -m unittest discover
+```
+
+To run end-to-end tests locally:
+
+```
+(my_virtualenv)$ make -C docs/ doctest
+```
+
+
 
 ### Documentation
 
