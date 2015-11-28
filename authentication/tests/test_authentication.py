@@ -61,8 +61,8 @@ class AuthenticationTests(InMemoryStorageTests):
 
             for method in rule.methods:
                 responses.add_callback(
-                    getattr(responses, method),
-                    re.compile(pattern),
+                    method=getattr(responses, method),
+                    url=re.compile(pattern),
                     callback=self.request_callback,
                     content_type='application/json',
                 )
