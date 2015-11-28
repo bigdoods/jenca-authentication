@@ -16,11 +16,13 @@ Storage Service API Endpoints
 Example Use
 ===========
 
-It is possible to interact with the authentication service using Python's requests.
+It is possible to interact with the authentication service using Python's
+requests.
 
 First, set a variable for the IP address of the Docker host machine.
 
-..    >>> docker_ip = subprocess.check_output(['docker-machine', 'ip', 'dev']).strip()
+..    >>> docker_ip = subprocess.check_output(['docker-machine', 'ip',
+.. 'dev']).strip()
 
 .. doctest::
 
@@ -35,8 +37,8 @@ First, set a variable for the IP address of the Docker host machine.
    >>> authentication_url = 'http://' + docker_ip.decode('utf8') + ':5000'
    >>> signup_url = authentication_url + '/signup'
    >>> headers = {'Content-Type': 'application/json'}
-   >>> data = {"email": "jenca@example.com", "password": "secret"}
-   >>> response = requests.post(url=signup_url, headers=headers, data=json.dumps(data))
+   >>> data = json.dumps({"email": "jenca@example.com", "password": "secret"})
+   >>> response = requests.post(url=signup_url, headers=headers, data=data)
    >>> response
    <Response [201]>
    >>> json.loads(response.text)
