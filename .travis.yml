@@ -10,11 +10,11 @@ python:
 # End-to-end tests use docker
 services:
   - docker
-# addons:
-#   apt:
-#     packages:
-#       # A spellchecking system used by Sphinx's spellchecking.
-#       - enchant
+addons:
+  apt:
+    packages:
+      # A spellchecking system used by Sphinx's spellchecking.
+      - enchant
 install:
   # Install a link checker on Python 2 but not Python 3 as it will not install
   # on Python 3.
