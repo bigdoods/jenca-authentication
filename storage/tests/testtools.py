@@ -17,7 +17,7 @@ class InMemoryStorageTests(unittest.TestCase):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
         self.storage_app = app.test_client()
         # This is useful for knowing about the available methods.
-        self.storage_url_map = app.url_map
+        self.storage_app.url_map = app.url_map
 
         with app.app_context():
             db.create_all()

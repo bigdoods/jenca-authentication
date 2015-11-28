@@ -47,7 +47,7 @@ class AuthenticationTests(InMemoryStorageTests):
 
         self.app = app.test_client()
 
-        for rule in self.storage_url_map.iter_rules():
+        for rule in self.storage_app.url_map.iter_rules():
             # We assume here that everything is in the style:
             # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
             # not necessarily the case.
