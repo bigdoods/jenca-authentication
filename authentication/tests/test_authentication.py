@@ -61,6 +61,8 @@ class AuthenticationTests(InMemoryStorageTests):
 
             for method in rule.methods:
                 responses.add_callback(
+                    # ``responses`` has methods named like the HTTP methods
+                    # they represent, e.g. ``responses.GET``.
                     method=getattr(responses, method),
                     url=re.compile(pattern),
                     callback=self.request_callback,
@@ -73,6 +75,8 @@ class AuthenticationTests(InMemoryStorageTests):
         an in memory fake of the storage service and return some key details
         of the response.
         """
+        # The storage application is a ``werkzeug.test.Client`` and therefore
+        # has methods like 'head', 'get' and 'post'.
         response = getattr(self.storage_app, request.method.lower())(
             request.path_url,
             content_type=request.headers['Content-Type'],
