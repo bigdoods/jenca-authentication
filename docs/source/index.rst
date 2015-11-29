@@ -21,8 +21,10 @@ requests.
 
 First, set a variable for the IP address of the Docker host machine.
 
-.. TODO Codeship are working on Docker support so this can be tested there
-
+.. TODO Tell the user to pip install things
+.. TODO don't render the sleep
+.. TODO disable CircleCI and Codeship
+.. TODO Fix tests
 .. TODO Tell the user to set an environment variable with the Docker IP address
 
 .. doctest::
