@@ -1,0 +1,11 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  pre:
+    - "pip install -e .[dev]"
+
+test:
+  pre:
+    - docker-compose up -d
