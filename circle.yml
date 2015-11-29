@@ -3,9 +3,9 @@ machine:
     - docker
 
 dependencies:
-  pre:
+  override:
     - "pip install -e .[dev]"
 
 test:
-  pre:
-    - docker-compose up -d
+  override:
+    - make -C docs/ doctest
