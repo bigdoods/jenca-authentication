@@ -39,6 +39,7 @@ First, set a variable for the IP address of the Docker host machine.
    >>> signup_url = authentication_url + '/signup'
    >>> headers = {'Content-Type': 'application/json'}
    >>> data = json.dumps({"email": "jenca@example.com", "password": "secret"})
+   >>> sleep(5)
    >>> response = requests.post(url=signup_url, headers=headers, data=data)
    >>> response
    <Response [201]>
