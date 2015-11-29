@@ -47,40 +47,24 @@ class AuthenticationTests(InMemoryStorageTests):
 
         self.app = app.test_client()
 
-        for rule in self.storage_url_map.iter_rules():
-            if rule.endpoint == 'static':
-                continue
+        for rule in self.storage_app.url_map.iter_rules():
+            # We assume here that everything is in the style:
+            # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
+            # not necessarily the case.
+            pattern = urljoin(
+                STORAGE_URL,
+                re.sub(pattern='<.+>', repl='.+', string=rule.rule),
+            )
 
             for method in rule.methods:
-                if method == 'POST':
-                    responses.add_callback(
-                        responses.POST,
-                        urljoin(STORAGE_URL, rule.rule),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-                elif method == 'GET':
-                    # We assume here that everything is in the style:
-                    # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
-                    # not necessarily the case.
-                    pattern = urljoin(
-                        STORAGE_URL,
-                        re.sub(pattern='<.+>', repl='.+', string=rule.rule),
-                    )
-
-                    responses.add_callback(
-                        responses.GET, re.compile(pattern),
-                        callback=self.request_callback,
-                        content_type='application/json',
-                    )
-                elif method in ('OPTIONS', 'HEAD'):
-                    # There is currently no need to support fake "OPTIONS"
-                    # or "HEAD" requests
-                    pass
-                else:  # pragma: no cover
-                    # Sometimes all methods are implemented, but this is still
-                    # useful, so do not count it as missing coverage.
-                    raise NotImplementedError()
+                responses.add_callback(
+                    # ``responses`` has methods named like the HTTP methods
+                    # they represent, e.g. ``responses.GET``.
+                    method=getattr(responses, method),
+                    url=re.compile(pattern),
+                    callback=self.request_callback,
+                    content_type='application/json',
+                )
 
     def request_callback(self, request):
         """
@@ -88,15 +72,12 @@ class AuthenticationTests(InMemoryStorageTests):
         an in memory fake of the storage service and return some key details
         of the response.
         """
-        if request.method == 'POST':
-            response = self.storage_app.post(
-                request.path_url,
-                content_type=request.headers['Content-Type'],
-                data=request.body)
-        elif request.method == 'GET':
-            response = self.storage_app.get(
-                request.path_url,
-                content_type=request.headers['Content-Type'])
+        # The storage application is a ``werkzeug.test.Client`` and therefore
+        # has methods like 'head', 'get' and 'post'.
+        response = getattr(self.storage_app, request.method.lower())(
+            request.path_url,
+            content_type=request.headers['Content-Type'],
+            data=request.body)
 
         return (
             response.status_code,
