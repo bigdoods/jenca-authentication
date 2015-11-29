@@ -47,33 +47,7 @@ class AuthenticationTests(InMemoryStorageTests):
 
         self.app = app.test_client()
 
-        self.method_map = {
-            'POST': {
-                'responses': responses.POST,
-                'storage': self.storage_app.post,
-            },
-            'GET': {
-                'responses': responses.GET,
-                'storage': self.storage_app.get,
-            },
-            'DELETE': {
-                'responses': responses.DELETE,
-                'storage': self.storage_app.delete,
-            },
-            'OPTIONS': {
-                'responses': responses.OPTIONS,
-                'storage': self.storage_app.options,
-            },
-            'HEAD': {
-                'responses': responses.HEAD,
-                'storage': self.storage_app.head,
-            },
-        }
-
-        for rule in self.storage_url_map.iter_rules():
-            if rule.endpoint == 'static':
-                continue
-
+        for rule in self.storage_app.url_map.iter_rules():
             # We assume here that everything is in the style:
             # "{uri}/{method}/<{id}>" or "{uri}/{method}" when this is
             # not necessarily the case.
@@ -84,8 +58,10 @@ class AuthenticationTests(InMemoryStorageTests):
 
             for method in rule.methods:
                 responses.add_callback(
-                    self.method_map[method]['responses'],
-                    re.compile(pattern),
+                    # ``responses`` has methods named like the HTTP methods
+                    # they represent, e.g. ``responses.GET``.
+                    method=getattr(responses, method),
+                    url=re.compile(pattern),
                     callback=self.request_callback,
                     content_type='application/json',
                 )
@@ -100,7 +76,9 @@ class AuthenticationTests(InMemoryStorageTests):
         :return: A tuple of status code, response headers and response data
             from the storage app.
         """
-        response = self.method_map[request.method]['storage'](
+        # The storage application is a ``werkzeug.test.Client`` and therefore
+        # has methods like 'head', 'get' and 'post'.
+        response = getattr(self.storage_app, request.method.lower())(
             request.path_url,
             content_type=request.headers['Content-Type'],
             data=request.body)
