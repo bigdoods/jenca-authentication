@@ -1,4 +1,5 @@
 coverage # Allows us to measure code coverage
+docker-compose
 doc8 # Style check documentation
 flake8 # Code analysis tool with linting
 PyEnchant # Dictionary interaction for spellchecking
