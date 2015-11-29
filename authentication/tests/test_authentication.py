@@ -406,6 +406,58 @@ class LoadUserTests(AuthenticationTests):
         self.assertIsNone(load_user_from_id(user_id='email'))
 
 
+class StatusTests(AuthenticationTests):
+    """
+    Tests for the endpoint to get the current user's details.
+    """
+
+    @responses.activate
+    def test_user_logged_in(self):
+        """
+        A ``GET`` request for information about the logged in user returns an
+        OK status code with a flag that there is an active user and that
+        user's email address if there is a logged in user.
+        """
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        self.app.post(
+            '/login',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+        response = self.app.get('/status', content_type='application/json')
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.OK)
+        expected = {
+            'is_authenticated': True,
+            'email': USER_DATA['email'],
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_no_user_logged_in(self):
+        """
+        A ``GET`` request for information about the logged in user returns an
+        OK status code and a flag describing that there is no active user if
+        there is no logged in user.
+        """
+        response = self.app.get('/status', content_type='application/json')
+        self.assertEqual(response.headers['Content-Type'], 'application/json')
+        self.assertEqual(response.status_code, codes.OK)
+        expected = {
+            'is_authenticated': False,
+        }
+        self.assertEqual(json.loads(response.data.decode('utf8')), expected)
+
+    def test_incorrect_content_type(self):
+        """
+        If a Content-Type header other than 'application/json' is given, an
+        UNSUPPORTED_MEDIA_TYPE status code is given.
+        """
+        response = self.app.get('/status', content_type='text/html')
+        self.assertEqual(response.status_code, codes.UNSUPPORTED_MEDIA_TYPE)
+
+
 class LoadUserFromTokenTests(AuthenticationTests):
     """
     Tests for ``load_user_from_token``, which is a function required by

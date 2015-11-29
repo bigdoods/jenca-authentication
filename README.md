@@ -34,6 +34,10 @@ $ curl -X POST \
   -g '192.168.99.100:5000/login' \
   -d '{"email": "user@example.com","password":"secret"}' \
   --cookie-jar ~/Desktop/my_cookie
+$ curl -X GET \
+  -H "Content-Type: application/json" \
+  -g '192.168.99.100:5000/status' \
+  --cookie-jar ~/Desktop/my_cookie
 $ curl -X POST \
   -H "Content-Type: application/json" \
   -g '192.168.99.100:5000/logout' \
@@ -69,5 +73,4 @@ $ open docs/build/html/index.html
 
 ## TODO
 
-* /status endpoint for user status (id of the logged in user, or no logged in user)
 * Some way of setting with Docker a way of describing whether the app should be in development or testing. This will likely be an environment variable. In testing only, share the code with the container as a volume with ".:code", which allows Flask to see code changes. In testing only, set debug mode to true in app.run(), which allows live changes as the code changes. In production make sure that all neccessary environment variables are set.
