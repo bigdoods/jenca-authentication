@@ -81,16 +81,29 @@ def on_validation_error(error):
     ), codes.BAD_REQUEST
 
 
-@app.route('/users/<email>', methods=['GET'])
+@app.route('/users/<email>', methods=['GET', 'DELETE'])
 @consumes('application/json')
-def get_user(email):
+def specific_user_route(email):
     """
+    **DELETE**:
+
+    Delete a particular user.
+
+    :reqheader Content-Type: application/json
+    :resheader Content-Type: application/json
+    :resjson string email: The email address of the deleted user.
+    :resjson string password_hash: The password hash of the deleted user.
+    :status 200: The user has been deleted.
+    :status 404: There is no user with the given ``email``.
+
+    **GET**:
+
     Get information about particular user.
 
     :reqheader Content-Type: application/json
     :resheader Content-Type: application/json
-    :resjson string email: The email address of the new user.
-    :resjson string password_hash: The password hash of the new user.
+    :resjson string email: The email address of the user.
+    :resjson string password_hash: The password hash of the user.
     :status 200: The requested user's information is returned.
     :status 404: There is no user with the given ``email``.
     """
@@ -102,6 +115,10 @@ def get_user(email):
             detail='No user exists with the email "{email}"'.format(
                 email=email),
         ), codes.NOT_FOUND
+
+    elif request.method == 'DELETE':
+        db.session.delete(user)
+        db.session.commit()
 
     return_data = jsonify(email=user.email, password_hash=user.password_hash)
     return return_data, codes.OK

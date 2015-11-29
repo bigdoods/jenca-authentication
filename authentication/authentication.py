@@ -89,10 +89,8 @@ def load_user_from_id(user_id):
         there is no such user.
     :rtype: ``User`` or ``None``.
     """
-    response = requests.get(
-        urljoin(STORAGE_URL, 'users/{email}').format(email=user_id),
-        headers={'Content-Type': 'application/json'},
-    )
+    url = urljoin(STORAGE_URL, 'users/{email}').format(email=user_id)
+    response = requests.get(url, headers={'Content-Type': 'application/json'})
 
     if response.status_code == codes.OK:
         details = json.loads(response.text)
@@ -202,6 +200,36 @@ def logout():
     """
     logout_user()
     return jsonify({}), codes.OK
+
+
+@app.route('/users/<email>', methods=['DELETE'])
+@consumes('application/json')
+def specific_user_route(email):
+    """
+    Delete a particular user.
+
+    :reqheader Content-Type: application/json
+    :resheader Content-Type: application/json
+    :resjson string email: The email address of the deleted user.
+    :status 200: The user has been deleted.
+    :status 404: There is no user with the given ``email``.
+    """
+    user = load_user_from_id(email)
+
+    if user is None:
+        return jsonify(
+            title='The requested user does not exist.',
+            detail='No user exists with the email "{email}"'.format(
+                email=email),
+        ), codes.NOT_FOUND
+
+    requests.delete(
+        urljoin(STORAGE_URL, '/users/{email}'.format(email=email)),
+        headers={'Content-Type': 'application/json'},
+    )
+
+    return_data = jsonify(email=user.email)
+    return return_data, codes.OK
 
 
 @app.route('/signup', methods=['POST'])
