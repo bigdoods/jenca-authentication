@@ -25,6 +25,7 @@ First, set a variable for the IP address of the Docker host machine.
 .. TODO don't render the sleep
 .. TODO disable CircleCI and Codeship
 .. TODO Fix tests
+.. TODO use Sphinx make
 .. TODO Tell the user to set an environment variable with the Docker IP address
 
 .. doctest::
