@@ -21,10 +21,9 @@ requests.
 
 First, set a variable for the IP address of the Docker host machine.
 
-.. TODO Try with Ubuntu on Vagrant
-.. TODO Try codeship
-..    >>> docker_ip = subprocess.check_output(['docker-machine', 'ip',
-.. 'dev']).strip()
+.. TODO Codeship are working on Docker support so this can be tested there
+
+.. TODO Tell the user to set an environment variable with the Docker IP address
 
 .. doctest::
 
