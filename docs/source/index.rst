@@ -27,6 +27,7 @@ First, set a variable for the IP address of the Docker host machine.
 .. TODO Fix tests
 .. TODO use Sphinx make
 .. TODO Tell the user to set an environment variable with the Docker IP address
+.. TODO Try running the unit tests without the mock responses when Docker is up
 
 .. doctest::
 
@@ -41,18 +42,19 @@ First, set a variable for the IP address of the Docker host machine.
    >>> authentication_url = 'http://' + docker_ip.decode('utf8') + ':5000'
    >>> signup_url = authentication_url + '/signup'
    >>> headers = {'Content-Type': 'application/json'}
-   >>> data = json.dumps({"email": "jenca@example.com", "password": "secret"})
-   >>> import time; time.sleep(5); response = requests.post(url=signup_url, headers=headers, data=data)
+   >>> data = {"email": "jenca@example.com", "password": "secret"}
+   >>> import time; time.sleep(5);
+   >>> response = requests.post(url=signup_url, headers=headers, data=json.dumps(data))
    >>> response
    <Response [201]>
-   >>> json.loads(response.text)
-   {'email': 'jenca@example.com', 'password': 'secret'}
+   >>> response.text
+   "{'email': 'jenca@example.com', 'password': 'secret'}"
    >>> status_url = authentication_url + '/status'
    >>> status = requests.get(url=status_url, headers=headers)
    >>> status
    <Response [200]>
-   >>> json.loads(status.text)
-   {'is_authenticated': False}
+   >>> status.text
+   "{'is_authenticated': False}"
 
 .. TODO move this to just after we have "data" set
 
