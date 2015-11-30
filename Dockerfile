@@ -3,9 +3,9 @@ FROM python
 
 WORKDIR /code
 
-# Add requirements file first so that requirements are only re-installed if the
-# requirements file changes, instead of if anything in the project changes.
-ADD ./requirements.txt /code/requirements.txt
+# Copy requirements file first so that requirements are only re-installed if
+# the requirements file changes, instead of if anything in the project changes.
+COPY requirements.txt /code/requirements.txt
 RUN pip install -r requirements.txt
 
 ADD . /code
