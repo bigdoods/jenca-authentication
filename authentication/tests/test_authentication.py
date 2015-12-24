@@ -350,6 +350,7 @@ class LogoutTests(AuthenticationTests):
         response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
 
+    @responses.activate
     def test_logout_twice(self):
         """
         A POST request to log out, after a successful log out attempt returns
