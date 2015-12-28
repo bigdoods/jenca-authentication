@@ -12,4 +12,7 @@ images:
 	docker tag jenca-cloud/jenca-authentication:latest-dev jenca-cloud/jenca-authentication:$(VERSION)-dev
 
 test:
-	echo "need to work out how to run the tests"
+	docker run -ti --rm \
+		--entrypoint "coverage" \
+		jenca-cloud/jenca-authentication:latest-dev \
+		run --source=authentication,storage -m unittest discover
