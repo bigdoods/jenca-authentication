@@ -7,7 +7,7 @@ VERSION = 1.0.0
 images:
 	docker build -t jenca-cloud/jenca-authentication:latest .
 	docker build -f Dockerfile.dev -t jenca-cloud/jenca-authentication:latest-dev .
-	docker rmi jenca-cloud/jenca-authentication:$(VERSION) jenca-cloud/jenca-authentication:$(VERSION)-dev
+	docker rmi jenca-cloud/jenca-authentication:$(VERSION) jenca-cloud/jenca-authentication:$(VERSION)-dev || true
 	docker tag jenca-cloud/jenca-authentication:latest jenca-cloud/jenca-authentication:$(VERSION)
 	docker tag jenca-cloud/jenca-authentication:latest-dev jenca-cloud/jenca-authentication:$(VERSION)-dev
 
