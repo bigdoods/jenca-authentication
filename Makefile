@@ -11,6 +11,8 @@ images:
 	docker tag jenca-cloud/jenca-authentication:latest jenca-cloud/jenca-authentication:$(VERSION)
 	docker tag jenca-cloud/jenca-authentication:latest-dev jenca-cloud/jenca-authentication:$(VERSION)-dev
 
+# run the tests inside a docker container
+# it will auto-delete itself once complete
 test:
 	docker run -ti --rm \
 		--entrypoint "coverage" \
