@@ -180,15 +180,16 @@ def users_route():
 
     if request.method == 'POST':
         return create_user()
-    elif request.method == 'GET':
-        details = [
-            {'email': user.email, 'password_hash': user.password_hash} for user
-            in User.query.all()]
 
-        return make_response(
-            json.dumps(details),
-            codes.OK,
-            {'Content-Type': 'application/json'})
+    # It the method type is not POST it is GET.
+    details = [
+        {'email': user.email, 'password_hash': user.password_hash} for user
+        in User.query.all()]
+
+    return make_response(
+        json.dumps(details),
+        codes.OK,
+        {'Content-Type': 'application/json'})
 
 if __name__ == '__main__':   # pragma: no cover
     # Specifying 0.0.0.0 as the host tells the operating system to listen on
