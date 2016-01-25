@@ -4,12 +4,6 @@ An authentication service for use in a Jenca Cloud.
 
 import os
 
-# This is necessary because urljoin moved between Python 2 and Python 3
-from future.standard_library import install_aliases
-install_aliases()
-
-from urllib.parse import urljoin
-
 from flask import Flask, jsonify, request, json
 from flask.ext.bcrypt import Bcrypt
 from flask.ext.login import (
@@ -26,6 +20,14 @@ from flask_negotiate import consumes
 
 import requests
 from requests import codes
+
+# This is necessary because urljoin moved between Python 2 and Python 3
+from future.standard_library import install_aliases
+install_aliases()
+
+# Ignore this line with linters because it necessarily comes after
+# `install_aliases`.
+from urllib.parse import urljoin  # noqa
 
 
 class User(UserMixin):
