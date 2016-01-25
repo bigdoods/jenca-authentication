@@ -350,6 +350,7 @@ class LogoutTests(AuthenticationTests):
         response = self.app.post('/logout', content_type='application/json')
         self.assertEqual(response.status_code, codes.UNAUTHORIZED)
 
+    @responses.activate
     def test_logout_twice(self):
         """
         A POST request to log out, after a successful log out attempt returns
@@ -492,7 +493,13 @@ class LoadUserFromTokenTests(AuthenticationTests):
         """
         If a token does not belong to a user, ``None`` is returned.
         """
-        self.assertIsNone(load_user_from_token(auth_token='fake_token'))
+        self.app.post(
+            '/signup',
+            content_type='application/json',
+            data=json.dumps(USER_DATA))
+
+        with app.app_context():
+            self.assertIsNone(load_user_from_token(auth_token='fake'))
 
 
 class DeleteUserTests(AuthenticationTests):
