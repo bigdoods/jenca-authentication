@@ -6,12 +6,6 @@ import json
 import re
 import unittest
 
-# This is necessary because urljoin moved between Python 2 and Python 3
-from future.standard_library import install_aliases
-install_aliases()
-
-from urllib.parse import urljoin
-
 from flask.ext.login import make_secure_token
 from requests import codes
 import responses
@@ -27,6 +21,14 @@ from authentication.authentication import (
 )
 
 from storage.tests.testtools import InMemoryStorageTests
+
+# This is necessary because urljoin moved between Python 2 and Python 3
+from future.standard_library import install_aliases
+install_aliases()
+
+# Ignore this line with linters because it necessarily comes after
+# `install_aliases`.
+from urllib.parse import urljoin  # noqa
 
 USER_DATA = {'email': 'alice@example.com', 'password': 'secret'}
 
