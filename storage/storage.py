@@ -45,6 +45,20 @@ def create_app(database_uri):
 
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI',
                                          'sqlite:///:memory:')
+
+POSTGRES_HOST = os.environ.get('POSTGRES_HOST', None)
+POSTGRES_USER = os.environ.get('POSTGRES_USER', 'username')
+POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'password')
+POSTGRES_DATABASE = os.environ.get('POSTGRES_DATABASE', 'jenca-authorisation')
+
+if POSTGRES_HOST is not None:
+    SQLALCHEMY_DATABASE_URI = "postgres://%s:%s@%s/%s" % (
+        POSTGRES_USER,
+        POSTGRES_PASSWORD,
+        POSTGRES_HOST,
+        POSTGRES_DATABASE
+    )
+
 app = create_app(database_uri=SQLALCHEMY_DATABASE_URI)
 
 # Inputs can be validated using JSON schema.
