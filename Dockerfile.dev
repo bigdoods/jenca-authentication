@@ -1,2 +1,2 @@
-FROM jenca-cloud/jenca-authentication:latest
+FROM jenca/jenca-authentication:latest
 RUN pip install -r dev-requirements.txt
