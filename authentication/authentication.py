@@ -72,8 +72,10 @@ login_manager.init_app(app)
 app.config['JSONSCHEMA_DIR'] = os.path.join(app.root_path, 'schemas')
 jsonschema = JsonSchema(app)
 
-STORAGE_URL = 'http://storage:5001'
+STORAGE_URL = os.environ.get('STORAGE_URL', 'http://storage:5001')
 
+if STORAGE_URL.find('env:')==0:
+    STORAGE_URL = os.environ.get(STORAGE_URL.split(':')[1])
 
 @login_manager.user_loader
 def load_user_from_id(user_id):
