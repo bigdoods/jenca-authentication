@@ -7,3 +7,4 @@ responses # Add mocks for requests
 Sphinx # Build documentation
 sphinxcontrib-httpdomain # Describe RESTful HTTP APIs in Sphinx
 sphinxcontrib-spelling # Check spelling in the documentation
+sphinx_rtd_theme # Theme for documentation
