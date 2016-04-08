@@ -52,7 +52,7 @@ POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD', 'password')
 POSTGRES_DATABASE = os.environ.get('POSTGRES_DATABASE', 'jenca-authorisation')
 
 if POSTGRES_HOST is not None:
-    if POSTGRES_HOST.find('env:')==0:
+    if POSTGRES_HOST.find('env:') == 0:
         POSTGRES_HOST = os.environ.get(POSTGRES_HOST.split(':')[1])
     SQLALCHEMY_DATABASE_URI = "postgres://%s:%s@%s/%s" % (
         POSTGRES_USER,
