@@ -1,5 +1,5 @@
 Flask==0.11.1
-Flask-Login==0.3.2
+Flask-Login==0.4.0
 Flask-Negotiate==0.1.0
 Flask-Bcrypt==0.7.1
 flask_jsonschema==0.1.1
