@@ -3,6 +3,6 @@ Flask-Login==0.4.0
 Flask-Negotiate==0.1.0
 Flask-Bcrypt==0.7.1
 flask_jsonschema==0.1.1
-Flask-SQLAlchemy==2.1
+Flask-SQLAlchemy==2.2
 future==0.16.0
 requests==2.13.0
